@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: oklch(0.975 0.006 235);
+  --color-surface: oklch(0.995 0.004 235);
+  --color-surface-muted: oklch(0.945 0.009 235);
+  --color-ink: oklch(0.245 0.025 245);
+  --color-ink-muted: oklch(0.5 0.025 245);
+  --color-rule: oklch(0.875 0.014 240);
+  --color-accent: oklch(0.57 0.14 238);
+  --color-accent-soft: oklch(0.92 0.04 238);
+  --color-anomaly: oklch(0.68 0.15 65);
+  --color-success: oklch(0.58 0.12 155);
+  --color-danger: oklch(0.58 0.18 28);
+}
+
+:root {
+  color: var(--color-ink);
+  background: var(--color-canvas);
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+button:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid color-mix(in oklch, var(--color-accent) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.section-heading {
+  color: var(--color-ink);
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.chart-tooltip {
+  border: 1px solid var(--color-rule) !important;
+  border-radius: 8px !important;
+  background: var(--color-surface) !important;
+  box-shadow: 0 12px 30px oklch(0.25 0.03 245 / 0.1) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

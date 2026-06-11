@@ -1,0 +1,26 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.code-review-graph/
+mlruns/
+artifacts/runs/
+models/*.pt
+models/*.joblib
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.vite/
+*.log
+notebooks/*.executed.ipynb
+.DS_Store
+Thumbs.db
+
+# Local project briefs and implementation planning
+PRODUCT.md
+DESIGN.md
+climate-co2-forecasting-ml-requirements.md
+docs/superpowers/
