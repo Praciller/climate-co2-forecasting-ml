@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import platform
 import subprocess
 from datetime import UTC, datetime
@@ -49,7 +49,6 @@ from src.utils.config import (
     SPLIT_BOUNDARIES,
 )
 from src.utils.io import read_json, write_json
-
 
 CANDIDATE_FILES = {
     "Naive": "naive.csv",
@@ -359,20 +358,26 @@ def build_comparison_markdown(
     lines = [
         "# Model Comparison",
         "",
-        "Candidate selection uses mean MAE across development rolling-origin "
-        "folds. The "
-        "selected model is then reported on the untouched final test period.",
+        (
+            "Candidate selection uses mean MAE across development rolling-origin "
+            "folds. The "
+            "selected model is then reported on the untouched final test period."
+        ),
         "",
         f"- Selected model: **{selected_model}**",
         "- Tie-break: mean fold RMSE, then explicit simplicity order",
         "- Detailed fold evidence: `rolling_origin_evaluation.md`",
-        f"- Final-test interval coverage: "
-        f"**{interval_report['observed_test_coverage']:.1%}** "
-        f"at {interval_report['nominal_coverage']:.0%} nominal "
-        f"({interval_report['evaluation_samples']} one-step forecasts)",
+        (
+            f"- Final-test interval coverage: "
+            f"**{interval_report['observed_test_coverage']:.1%}** "
+            f"at {interval_report['nominal_coverage']:.0%} nominal "
+            f"({interval_report['evaluation_samples']} one-step forecasts)"
+        ),
         "",
-        "| Model | Validation MAE | Validation RMSE | Test MAE | Test RMSE | "
-        "Test sMAPE | Test MASE | Notes |",
+        (
+            "| Model | Validation MAE | Validation RMSE | Test MAE | Test RMSE | "
+            "Test sMAPE | Test MASE | Notes |"
+        ),
         "|---|---:|---:|---:|---:|---:|---:|---|",
     ]
     for name in sorted(
@@ -393,9 +398,11 @@ def build_comparison_markdown(
             "",
             "## Neural pipeline smoke",
             "",
-            "The PyTorch LSTM is excluded from selection and the candidate table. "
-            "Its bounded run verifies sequence construction, train-only scaling, "
-            "validation monitoring, checkpoint restoration, and CPU execution.",
+            (
+                "The PyTorch LSTM is excluded from selection and the candidate table. "
+                "Its bounded run verifies sequence construction, train-only scaling, "
+                "validation monitoring, checkpoint restoration, and CPU execution."
+            ),
             "",
             f"- Evidence type: `{lstm_smoke.get('evidence_type', 'missing')}`",
             f"- Epochs completed: {lstm_smoke.get('epochs_completed', 'unknown')}",

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ class ServiceNotReadyError(RuntimeError):
 
 
 class ForecastService:
-    REQUIRED_ARTIFACTS = {
+    REQUIRED_ARTIFACTS: ClassVar[set[str]] = {
         "monthly_data",
         "forecast_metrics",
         "interval_report",
@@ -81,8 +81,10 @@ class ForecastService:
         if not pd.DatetimeIndex(dates).equals(expected):
             raise ArtifactValidationError("Forecast timestamps are not contiguous.")
         for row in forecast:
-            if not float(row["lower"]) <= float(row["prediction"]) <= float(
-                row["upper"]
+            if (
+                not float(row["lower"])
+                <= float(row["prediction"])
+                <= float(row["upper"])
             ):
                 raise ArtifactValidationError("Forecast interval ordering is invalid.")
 
@@ -126,9 +128,7 @@ class ForecastService:
                 "date": index.date(),
                 "co2": float(row.co2),
                 "rolling_mean_12": (
-                    None
-                    if pd.isna(row.rolling_mean_12)
-                    else float(row.rolling_mean_12)
+                    None if pd.isna(row.rolling_mean_12) else float(row.rolling_mean_12)
                 ),
             }
             for index, row in frame.iterrows()
@@ -174,9 +174,7 @@ class ForecastService:
                         if pd.isna(row.get("isolation_score"))
                         else float(row["isolation_score"])
                     ),
-                    "isolation_forest_anomaly": bool(
-                        row["isolation_forest_anomaly"]
-                    ),
+                    "isolation_forest_anomaly": bool(row["isolation_forest_anomaly"]),
                     "methods": str(row["methods"]).split("|"),
                 }
             )

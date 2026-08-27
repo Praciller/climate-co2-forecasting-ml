@@ -7,7 +7,8 @@ from src.eda.generate_eda import main as generate_eda
 from src.evaluation.evaluate_forecasts import main as evaluate_forecasts
 from src.features.preprocess_timeseries import main as preprocess
 from src.models.train_baselines import main as train_baselines
-from src.models.train_lstm import TrainingConfig, train as train_lstm
+from src.models.train_lstm import TrainingConfig
+from src.models.train_lstm import train as train_lstm
 from src.models.train_ml_regressors import main as train_ml
 from src.models.train_statistical import main as train_statistical
 

@@ -95,9 +95,7 @@ def main() -> None:
     residual_flag = test_residuals.abs() > residual_threshold
 
     anomaly_features = build_isolation_features(monthly)
-    development_index = features.index[
-        features["split"].isin(["train", "validation"])
-    ]
+    development_index = features.index[features["split"].isin(["train", "validation"])]
     test_index = features.index[features["split"] == "test"]
     development = anomaly_features.loc[
         anomaly_features.index.intersection(development_index)
@@ -138,27 +136,30 @@ def main() -> None:
     anomalies.reset_index(names="date").to_csv(ANOMALIES_PATH, index=False)
 
     both = int(
-        (
-            aligned["residual_anomaly"]
-            & aligned["isolation_forest_anomaly"]
-        ).sum()
+        (aligned["residual_anomaly"] & aligned["isolation_forest_anomaly"]).sum()
     )
     report = "\n".join(
         [
             "# Anomaly Signal Report",
             "",
-            "These are exploratory statistical signals under selected methods "
-            "and assumptions, not verified climate events.",
+            (
+                "These are exploratory statistical signals under selected methods "
+                "and assumptions, not verified climate events."
+            ),
             "",
             "## Governed methods",
             "",
             f"- Residual source: {selected_model} rolling one-step forecasts",
             "- Residual threshold calibrated on validation only",
-            f"- Residual threshold: {residual_threshold:.3f} ppm "
-            f"({RESIDUAL_NOMINAL_COVERAGE:.0%} nominal)",
+            (
+                f"- Residual threshold: {residual_threshold:.3f} ppm "
+                f"({RESIDUAL_NOMINAL_COVERAGE:.0%} nominal)"
+            ),
             "- Isolation Forest fit on train and validation only",
-            "- Isolation features: changes, prior-window deviation/scale, and "
-            "cyclical month; no absolute year or raw level",
+            (
+                "- Isolation features: changes, prior-window deviation/scale, and "
+                "cyclical month; no absolute year or raw level"
+            ),
             f"- Isolation contamination assumption: {ISOLATION_CONTAMINATION:.0%}",
             f"- Development-score threshold: {isolation_threshold:.6f}",
             "",
@@ -166,13 +167,17 @@ def main() -> None:
             "",
             f"- Evaluated months: {len(aligned)}",
             f"- Residual signals: {int(aligned['residual_anomaly'].sum())}",
-            f"- Isolation Forest signals: "
-            f"{int(aligned['isolation_forest_anomaly'].sum())}",
+            (
+                f"- Isolation Forest signals: "
+                f"{int(aligned['isolation_forest_anomaly'].sum())}"
+            ),
             f"- Flagged by both methods: {both}",
             f"- Unique flagged months: {int(aligned['is_anomaly'].sum())}",
             "",
-            "Method disagreement is preserved in the CSV rather than merged "
-            "into a confidence claim.",
+            (
+                "Method disagreement is preserved in the CSV rather than merged "
+                "into a confidence claim."
+            ),
         ]
     )
     (REPORTS_DIR / "anomaly_report.md").write_text(report, encoding="utf-8")

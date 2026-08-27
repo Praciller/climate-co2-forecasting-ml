@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -33,7 +35,7 @@ def test_expanding_folds_are_chronological_non_overlapping_and_deterministic() -
     )
 
     assert folds == repeated
-    for previous, current in zip(folds, folds[1:], strict=False):
+    for previous, current in itertools.pairwise(folds):
         assert previous.validation_end < current.validation_start
         assert previous.train_end < previous.validation_start
         assert current.train_end < current.validation_start

@@ -61,18 +61,22 @@ def build_rolling_origin_markdown(
     lines = [
         "# Rolling-Origin Evaluation",
         "",
-        "Development-only expanding-window backtesting uses chronological, "
-        f"non-overlapping {fold_horizon}-month validation blocks. Each target is forecast "
-        "one month after its permitted origin, then its actual value is appended "
-        "to the next origin's history.",
+        (
+            "Development-only expanding-window backtesting uses chronological, "
+            f"non-overlapping {fold_horizon}-month validation blocks. Each target is forecast "
+            "one month after its permitted origin, then its actual value is appended "
+            "to the next origin's history."
+        ),
         "",
         f"- Fold count: **{len(result.folds)}**",
         f"- Development boundary: **{result.development_end.date()}**",
         f"- Models: {', '.join(result.models)}",
         f"- Robust development choice: **{selected_model}**",
         "- Selection key: mean fold MAE, mean fold RMSE, then simplicity",
-        "- Final governed/test rows are not used for folds, selection, or "
-        "interval calibration.",
+        (
+            "- Final governed/test rows are not used for folds, selection, or "
+            "interval calibration."
+        ),
         "",
         "## Temporal folds",
         "",
@@ -90,8 +94,10 @@ def build_rolling_origin_markdown(
             "",
             "## Aggregate metrics",
             "",
-            "Values are mean ± population standard deviation across folds; "
-            "the median is retained in JSON for skewed fold distributions.",
+            (
+                "Values are mean ± population standard deviation across folds; "
+                "the median is retained in JSON for skewed fold distributions."
+            ),
             "",
             "| Model | MAE | RMSE | sMAPE | MASE |",
             "|---|---:|---:|---:|---:|",
@@ -114,14 +120,18 @@ def build_rolling_origin_markdown(
             "",
             "## Interpretation and limits",
             "",
-            f"**{selected_model}** has the lowest mean development-fold MAE in "
-            "this bounded candidate set. This is robustness evidence for this "
-            "historical series, not a universal model claim.",
+            (
+                f"**{selected_model}** has the lowest mean development-fold MAE in "
+                "this bounded candidate set. This is robustness evidence for this "
+                "historical series, not a universal model claim."
+            ),
             "",
-            "The final governed/test period remains a one-time post-selection "
-            "evaluation. Fold residuals are out-of-sample for their own origins, "
-            "but temporal dependence and regime change mean formal exchangeable "
-            "conformal guarantees should not be assumed.",
+            (
+                "The final governed/test period remains a one-time post-selection "
+                "evaluation. Fold residuals are out-of-sample for their own origins, "
+                "but temporal dependence and regime change mean formal exchangeable "
+                "conformal guarantees should not be assumed."
+            ),
         ]
     )
     return "\n".join(lines)

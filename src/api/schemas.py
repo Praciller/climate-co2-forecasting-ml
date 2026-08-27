@@ -18,7 +18,7 @@ class ForecastPoint(BaseModel):
     upper: float
 
     @model_validator(mode="after")
-    def validate_interval(self) -> "ForecastPoint":
+    def validate_interval(self) -> ForecastPoint:
         if self.lower > self.upper:
             raise ValueError("Forecast lower bound must not exceed upper bound.")
         if not self.lower <= self.prediction <= self.upper:
@@ -41,7 +41,7 @@ class ForecastResponse(BaseModel):
     forecast: list[ForecastPoint]
 
     @model_validator(mode="after")
-    def validate_horizon_length(self) -> "ForecastResponse":
+    def validate_horizon_length(self) -> ForecastResponse:
         if self.horizon_months != len(self.forecast):
             raise ValueError("Forecast length must match horizon_months.")
         return self

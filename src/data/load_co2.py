@@ -50,9 +50,11 @@ def build_metadata(frame: pd.DataFrame) -> str:
             f"- **Source-data license:** {DATASET_LICENSE}",
             f"- **CSV SHA-256:** `{fingerprint}`",
             "",
-            "This is a historical dataset packaged with statsmodels. It is not "
-            "a current monitoring feed and this repository performs no network "
-            "retrieval when loading it.",
+            (
+                "This is a historical dataset packaged with statsmodels. It is not "
+                "a current monitoring feed and this repository performs no network "
+                "retrieval when loading it."
+            ),
         ]
     )
 

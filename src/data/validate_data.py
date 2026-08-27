@@ -4,7 +4,12 @@ import pandas as pd
 
 from src.data.load_co2 import load_co2_dataset
 from src.features.preprocess_timeseries import build_monthly_features
-from src.utils.config import PROJECT_ROOT, RAW_DATA_PATH, REPORTS_DIR, ensure_project_directories
+from src.utils.config import (
+    PROJECT_ROOT,
+    RAW_DATA_PATH,
+    REPORTS_DIR,
+    ensure_project_directories,
+)
 
 
 def load_source_frame() -> pd.DataFrame:
