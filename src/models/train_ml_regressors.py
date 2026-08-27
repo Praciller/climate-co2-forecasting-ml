@@ -35,42 +35,51 @@ def build_models(seed: int) -> dict[str, object]:
 
 def main(seed: int = 42) -> None:
     _, features = load_modeling_data()
-    development = features[features["split"].isin(["train", "validation"])]
-    test = features[features["split"] == "test"]
-    x_development = feature_matrix(development)
-    y_development = development["co2"]
-    x_test = feature_matrix(test)
-    y_test = test["co2"]
-
     metrics = {}
     predictions = {}
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-    for model_name, model in build_models(seed).items():
-        model.fit(x_development, y_development)
-        values = model.predict(x_test)
-        metrics[model_name] = calculate_metrics(
-            y_test.to_numpy(),
-            values,
-            y_development.to_numpy(),
-        )
-        save_prediction_artifact(model_name, test.index, y_test, values)
-        predictions[model_name] = pd.Series(values, index=test.index)
-        artifact_name = (
-            "random_forest_forecaster.joblib"
-            if model_name == "Random Forest"
-            else "gradient_boosting_forecaster.joblib"
-        )
-        joblib.dump(model, MODELS_DIR / artifact_name)
+    for split_name, training_splits in (
+        ("validation", ["train"]),
+        ("test", ["train", "validation"]),
+    ):
+        training = features[features["split"].isin(training_splits)]
+        target = features[features["split"] == split_name]
+        split_metrics = {}
+        for model_name, model in build_models(seed).items():
+            model.fit(feature_matrix(training), training["co2"])
+            values = model.predict(feature_matrix(target))
+            split_metrics[model_name] = calculate_metrics(
+                target["co2"].to_numpy(),
+                values,
+                training["co2"].to_numpy(),
+            )
+            save_prediction_artifact(
+                model_name,
+                target.index,
+                target["co2"],
+                values,
+                evaluation_split=split_name,
+                refit_at_each_origin=False,
+            )
+            if split_name == "test":
+                predictions[model_name] = pd.Series(values, index=target.index)
+                artifact_name = (
+                    "random_forest_forecaster.joblib"
+                    if model_name == "Random Forest"
+                    else "gradient_boosting_forecaster.joblib"
+                )
+                joblib.dump(model, MODELS_DIR / artifact_name)
+        metrics[split_name] = split_metrics
 
     save_metrics(REPORTS_DIR / "ml_regressor_metrics.json", metrics)
     save_forecast_plot(
         FIGURES_DIR / "ml_forecast.png",
-        "Machine-learning forecasts on the held-out test period",
-        y_test,
+        "Machine-learning one-step forecasts on the final test period",
+        target["co2"],
         predictions,
     )
-    print("Trained Random Forest and Gradient Boosting regressors.")
+    print("Generated validation and final-test evidence for two ML regressors.")
 
 
 if __name__ == "__main__":

@@ -1,31 +1,42 @@
 # Verification
 
-Fresh verification completed on June 12, 2026.
+Fresh local verification completed on August 27, 2026. This evidence applies to
+the repository working tree on `feat/rolling-origin-interval-eval`.
 
-## Reproducibility
+## Governed pipeline
 
 | Gate | Result |
 |---|---|
-| Python dependency install | Passed; `pip check` reported no broken requirements |
-| Data loading | Passed; 2,284 weekly rows saved |
-| Validation | Passed; markdown report regenerated |
-| Preprocessing | Passed; 526 monthly rows and chronological features regenerated |
-| Baseline models | Passed |
-| Statistical models | Passed; Exponential Smoothing selected |
-| ML regressors | Passed |
-| PyTorch LSTM debug run | Passed; two CPU epochs |
-| Shared evaluation | Passed; best MAE 0.237 ppm |
-| Anomaly detection | Passed; 16 exploratory rows |
-| EDA generation | Passed; four required figures regenerated |
+| Raw source integrity | Passed; SHA-256 `6d5ee9e8d32c1f8fa5f24f30a33ada05615ab19b3c4f6699fd2efc7d29b73085` |
+| Causal preprocessing | Passed; 526 monthly rows, 5 imputed months, maximum causal fill 3 months |
+| Explicit split | Train through 1989-01-31; validation through 1995-06-30; locked test through 2001-12-31 |
+| Temporal contract | Passed; causal lags/rolling statistics, causal fill, train-only scaling, and fixed boundaries |
+| Rolling-origin backtest | Passed; 11 non-overlapping seven-month development folds, SARIMA mean MAE `0.2394` ppm |
+| Candidate selection | SARIMA selected on mean development-fold MAE `0.2394` ppm |
+| Locked final test | SARIMA MAE `0.2433` ppm; evaluated only after selection |
+| 90% prediction interval | Development-fold residual quantile; 91.03% observed one-step test coverage; 1.011 ppm average width; 78 test months |
+| Residual diagnostic | Mean `0.0216`; standard deviation `0.2973`; lag-1 correlation `0.0511` |
+| Anomaly boundary | 8 Isolation Forest flags; 0 residual flags; development-calibrated thresholds |
+| Artifact manifest | Passed; eight governed artifacts validated by path, schema, and SHA-256 |
+| Repository guardrails | Passed; 149 tracked and intended files scanned |
 
-## Automated Checks
+The LSTM is a validation-only pipeline smoke test. It is excluded from model
+ranking and is not evidence of competitive forecasting performance.
+
+## Automated checks
 
 ```text
-python -m pytest
-11 passed
+python -m pytest -q
+36 passed
+
+ruff check src tests
+All checks passed
 
 python -m compileall -q src
 exit 0
+
+python -m src.verify_repository
+Repository guardrails passed for 149 tracked and intended files.
 
 jupyter nbconvert --execute notebooks/01_eda.ipynb
 11 cells, 5 code cells, 0 execution errors
@@ -40,42 +51,38 @@ npm run build
 exit 0
 ```
 
-CI repeats backend tests, bytecode compilation, notebook execution, frontend
-lint, and frontend production build on pushes and pull requests.
+## Docker and API
 
-## Docker Compose
+`docker compose config` passed. Both images built and ran as unprivileged users;
+the API and frontend health checks became healthy.
 
-Both images built and started through Docker Compose using alternate host ports:
-
-- frontend: HTTP 200
-- `/health`: HTTP 200
-- `/model-info`: HTTP 200
-- `/historical-data`: HTTP 200
-- `/forecast?horizon_months=24`: HTTP 200
-- `/anomalies`: HTTP 200
+- `/health`: HTTP 200, liveness `ok`, readiness `true`
+- `/ready`: HTTP 200
+- `/model-info`: HTTP 200, development-fold-selected SARIMA
+- `/historical-data`: HTTP 200, 526 rows
+- `/forecast?horizon_months=60`: HTTP 200, 60 contiguous month-end rows with ordered intervals
+- `/anomalies`: HTTP 200, 8 rows
 - `/docs`: HTTP 200
-- 10-request forecast benchmark: 4.37 ms mean, 21.57 ms maximum
 
-The benchmark is local evidence, not a production latency guarantee.
+The service fails readiness closed when the manifest is missing or a governed
+artifact checksum does not match. Error responses are sanitized.
 
-## Browser Smoke
+## Browser acceptance
 
-Verified against the Docker frontend and API:
+Playwright acceptance was run against the Docker frontend and API at desktop and
+390-by-844 mobile viewports. The final run covered navigation, API connection,
+validation/test labels, the six-month horizon interaction, anomaly caveats,
+model comparison, keyboard focus, console errors, and page-level overflow.
+Updated screenshots are stored in `reports/screenshots/`.
 
-- dashboard title and API-connected state
-- overview metrics and model comparison
-- navigation to Forecasting, Anomaly Detection, and Model Evaluation
-- forecast horizon change from 24 to 6 months produced six table rows
-- anomaly page produced 16 flagged rows and retained the exploratory caveat
-- evaluation page produced eight model rows
-- residual and error images loaded with non-zero natural dimensions
-- 390-by-844 mobile viewport had no page-level horizontal overflow
-- mobile navigation remained independently horizontally scrollable
+## Residual risk and scope
 
-## Residual Risk
-
-- LSTM evidence is a debug pipeline run, not tuned model performance.
-- Forecast intervals are residual-scaled approximations.
-- Browser automation retained one historical Recharts warning from an older
-  asset; the current build sets explicit initial chart dimensions and produced
-  no new warning entry during the rerun.
+- The live forecast is a fixed-origin historical extension from 2001-12-31, not
+  a current atmospheric forecast.
+- Interval coverage is measured for rolling one-step predictions on the locked
+  historical test only; the 90% interval is not a guarantee for 60-step
+  recursive horizons or a 95% confidence interval.
+- Anomaly flags are exploratory statistical signals, not confirmed measurement
+  errors or climate events.
+- No production deployment, external monitoring, or current-data ingestion was
+  verified.

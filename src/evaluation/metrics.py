@@ -9,7 +9,7 @@ def calculate_metrics(
     training: np.ndarray,
     *,
     seasonal_period: int = 12,
-) -> dict[str, float]:
+) -> dict[str, float | None]:
     actual_values = np.asarray(actual, dtype=float)
     predicted_values = np.asarray(predicted, dtype=float)
     training_values = np.asarray(training, dtype=float)
@@ -23,12 +23,30 @@ def calculate_metrics(
 
     errors = actual_values - predicted_values
     nonzero_actual = np.abs(actual_values) > np.finfo(float).eps
-    mape = np.mean(np.abs(errors[nonzero_actual] / actual_values[nonzero_actual])) * 100
+    mape = (
+        float(
+            np.mean(
+                np.abs(errors[nonzero_actual] / actual_values[nonzero_actual])
+            )
+            * 100
+        )
+        if nonzero_actual.any()
+        else None
+    )
     denominator = (np.abs(actual_values) + np.abs(predicted_values)) / 2
     nonzero_denominator = denominator > np.finfo(float).eps
     smape = (
-        np.mean(np.abs(errors[nonzero_denominator]) / denominator[nonzero_denominator])
-        * 100
+        float(
+            np.mean(
+                np.abs(
+                    errors[nonzero_denominator]
+                    / denominator[nonzero_denominator]
+                )
+            )
+            * 100
+        )
+        if nonzero_denominator.any()
+        else None
     )
     naive_scale = np.mean(
         np.abs(training_values[seasonal_period:] - training_values[:-seasonal_period])
@@ -39,7 +57,7 @@ def calculate_metrics(
     return {
         "mae": float(np.mean(np.abs(errors))),
         "rmse": float(np.sqrt(np.mean(np.square(errors)))),
-        "mape": float(mape),
-        "smape": float(smape),
+        "mape": mape,
+        "smape": smape,
         "mase": float(np.mean(np.abs(errors)) / naive_scale),
     }

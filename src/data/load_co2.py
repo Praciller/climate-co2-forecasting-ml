@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+import hashlib
+from importlib.metadata import version
+
 import pandas as pd
 import statsmodels.api as sm
 
 from src.utils.config import (
+    DATASET_LICENSE,
+    DATASET_MODULE,
+    DATASET_NAME,
+    DATASET_RETRIEVED_UPSTREAM,
+    DATASET_UNIT,
     PROJECT_ROOT,
     RAW_DATA_PATH,
     REPORTS_DIR,
@@ -21,19 +29,32 @@ def load_co2_dataset() -> pd.DataFrame:
 
 def build_metadata(frame: pd.DataFrame) -> str:
     inferred_frequency = pd.infer_freq(frame.index[:50]) or "irregular weekly"
+    fingerprint = hashlib.sha256(
+        frame.to_csv(index_label="date").encode("utf-8")
+    ).hexdigest()
     return "\n".join(
         [
             "# Dataset Metadata",
             "",
-            "- **Source:** statsmodels atmospheric CO2 dataset",
-            f"- **Rows:** {len(frame):,}",
+            f"- **Dataset:** {DATASET_NAME}",
+            f"- **Package module:** `{DATASET_MODULE}`",
+            f"- **statsmodels version:** {version('statsmodels')}",
+            f"- **Weekly calendar rows:** {len(frame):,}",
+            f"- **Observed values:** {int(frame['co2'].notna().sum()):,}",
             f"- **Date range:** {frame.index.min().date()} to {frame.index.max().date()}",
-            f"- **Columns:** {', '.join(frame.columns)}",
+            f"- **Unit:** {DATASET_UNIT}",
             f"- **Index frequency:** {inferred_frequency}",
             f"- **Missing CO2 values:** {int(frame['co2'].isna().sum()):,}",
-            "- **Synthetic data:** No",
+            f"- **Duplicate timestamps:** {int(frame.index.duplicated().sum()):,}",
+            f"- **Upstream retrieval date:** {DATASET_RETRIEVED_UPSTREAM}",
+            f"- **Source-data license:** {DATASET_LICENSE}",
+            f"- **CSV SHA-256:** `{fingerprint}`",
             "",
-            "Loaded with `statsmodels.api.datasets.co2.load_pandas()`.",
+            (
+                "This is a historical dataset packaged with statsmodels. It is not "
+                "a current monitoring feed and this repository performs no network "
+                "retrieval when loading it."
+            ),
         ]
     )
 

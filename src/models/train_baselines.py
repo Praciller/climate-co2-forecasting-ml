@@ -35,30 +35,45 @@ def walk_forward_baselines(
 
 def main() -> None:
     monthly, features = load_modeling_data()
-    test_dates = features.index[features["split"] == "test"]
-    test = monthly.loc[test_dates, "co2"]
-    history = monthly.loc[monthly.index < test_dates.min(), "co2"]
-    predictions = walk_forward_baselines(history, test)
     metrics = {}
     plotted = {}
 
-    for model_name, values in predictions.items():
-        metrics[model_name] = calculate_metrics(
-            test.to_numpy(),
-            values,
-            history.to_numpy(),
-        )
-        save_prediction_artifact(model_name, test.index, test, values)
-        plotted[model_name] = pd.Series(values, index=test.index)
+    for split_name, history_splits in (
+        ("validation", ["train"]),
+        ("test", ["train", "validation"]),
+    ):
+        target_dates = features.index[features["split"] == split_name]
+        target = monthly.loc[target_dates, "co2"]
+        history = monthly.loc[monthly.index < target_dates.min(), "co2"]
+        predictions = walk_forward_baselines(history, target)
+        split_metrics = {}
+
+        for model_name, values in predictions.items():
+            split_metrics[model_name] = calculate_metrics(
+                target.to_numpy(),
+                values,
+                history.to_numpy(),
+            )
+            save_prediction_artifact(
+                model_name,
+                target.index,
+                target,
+                values,
+                evaluation_split=split_name,
+                refit_at_each_origin=False,
+            )
+            if split_name == "test":
+                plotted[model_name] = pd.Series(values, index=target.index)
+        metrics[split_name] = split_metrics
 
     save_metrics(REPORTS_DIR / "baseline_metrics.json", metrics)
     save_forecast_plot(
         FIGURES_DIR / "baseline_forecast.png",
-        "Baseline forecasts on the held-out test period",
-        test,
+        "Baseline rolling one-step forecasts on the final test period",
+        target,
         plotted,
     )
-    print("Trained and evaluated three baseline models.")
+    print("Generated validation and final-test evidence for three baselines.")
 
 
 if __name__ == "__main__":
