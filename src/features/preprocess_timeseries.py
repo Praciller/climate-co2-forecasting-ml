@@ -5,9 +5,13 @@ import pandas as pd
 from src.data.load_co2 import load_co2_dataset
 from src.utils.config import (
     FEATURE_DATA_PATH,
+    MAX_CAUSAL_FILL_MONTHS,
     MONTHLY_DATA_PATH,
     PROJECT_ROOT,
     RAW_DATA_PATH,
+    TEST_END,
+    TRAIN_END,
+    VALIDATION_END,
     ensure_project_directories,
 )
 
@@ -37,13 +41,24 @@ def build_monthly_features(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
     if frame.index.has_duplicates:
         raise ValueError("Duplicate timestamps must be resolved before preprocessing.")
 
-    monthly = (
-        frame.sort_index()["co2"]
-        .resample("ME")
-        .mean()
-        .interpolate(method="time", limit_direction="both")
-        .to_frame()
-    )
+    values = frame.sort_index()["co2"]
+    monthly_values = values.resample("ME").mean()
+    observed_week_count = values.resample("ME").count()
+    missing_before = monthly_values.isna()
+    monthly_values = monthly_values.ffill(limit=MAX_CAUSAL_FILL_MONTHS)
+    if monthly_values.isna().any():
+        unresolved = ", ".join(
+            timestamp.date().isoformat()
+            for timestamp in monthly_values[monthly_values.isna()].index
+        )
+        raise ValueError(
+            "Monthly gaps exceed the causal fill contract or occur before the "
+            f"first observation: {unresolved}"
+        )
+
+    monthly = monthly_values.to_frame("co2")
+    monthly["observed_week_count"] = observed_week_count.astype(int)
+    monthly["is_imputed"] = missing_before
     features = monthly.copy()
     shifted = monthly["co2"].shift(1)
 
@@ -60,17 +75,32 @@ def build_monthly_features(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
 
 
 def chronological_split(frame: pd.DataFrame) -> pd.DataFrame:
-    if len(frame) < 3:
-        raise ValueError("At least three rows are required for chronological splitting.")
-
-    train_end = max(1, int(len(frame) * 0.70))
-    validation_end = max(train_end + 1, int(len(frame) * 0.85))
-    validation_end = min(validation_end, len(frame) - 1)
+    if frame.empty:
+        raise ValueError("At least one row is required for chronological splitting.")
+    if not frame.index.is_monotonic_increasing or frame.index.has_duplicates:
+        raise ValueError("Split input must have a unique, increasing datetime index.")
+    if frame.index.min() > TRAIN_END or frame.index.max() < TEST_END:
+        raise ValueError("Frame does not cover the governed split boundaries.")
+    if frame.index.max() > TEST_END:
+        raise ValueError("Frame contains observations after the governed test boundary.")
 
     split = frame.copy()
-    split["split"] = "test"
-    split.iloc[:train_end, split.columns.get_loc("split")] = "train"
-    split.iloc[train_end:validation_end, split.columns.get_loc("split")] = "validation"
+    split["split"] = pd.Series(index=split.index, dtype="string")
+    split.loc[split.index <= TRAIN_END, "split"] = "train"
+    split.loc[
+        (split.index > TRAIN_END) & (split.index <= VALIDATION_END),
+        "split",
+    ] = "validation"
+    split.loc[
+        (split.index > VALIDATION_END) & (split.index <= TEST_END),
+        "split",
+    ] = "test"
+    if split["split"].isna().any() or set(split["split"]) != {
+        "train",
+        "validation",
+        "test",
+    }:
+        raise ValueError("Governed split assignment is incomplete.")
     return split
 
 

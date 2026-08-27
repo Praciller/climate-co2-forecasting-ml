@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from dataclasses import asdict, dataclass
 
 import matplotlib
@@ -33,6 +34,7 @@ class TrainingConfig:
     learning_rate: float = 0.001
     hidden_size: int = 32
     seed: int = 42
+    patience: int = 10
 
 
 class SequenceDataset(Dataset):
@@ -80,7 +82,6 @@ def train(config: TrainingConfig) -> None:
     monthly, features = load_modeling_data()
     train_end = features.index[features["split"] == "train"].max()
     validation_end = features.index[features["split"] == "validation"].max()
-    test_dates = features.index[features["split"] == "test"]
 
     scaler = StandardScaler()
     scaler.fit(monthly.loc[:train_end, ["co2"]])
@@ -93,23 +94,24 @@ def train(config: TrainingConfig) -> None:
 
     train_mask = dates <= train_end
     validation_mask = (dates > train_end) & (dates <= validation_end)
-    test_mask = dates.isin(test_dates)
     train_dataset = SequenceDataset(sequences[train_mask], targets[train_mask])
     validation_dataset = SequenceDataset(
         sequences[validation_mask],
         targets[validation_mask],
     )
-    test_dataset = SequenceDataset(sequences[test_mask], targets[test_mask])
     train_loader = DataLoader(
         train_dataset,
         batch_size=config.batch_size,
-        shuffle=True,
+        shuffle=False,
     )
 
     model = LSTMForecaster(config.hidden_size)
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
     loss_function = nn.MSELoss()
     training_losses, validation_losses = [], []
+    best_validation_loss = float("inf")
+    best_state = copy.deepcopy(model.state_dict())
+    epochs_without_improvement = 0
 
     for _ in range(config.epochs):
         model.train()
@@ -130,21 +132,35 @@ def train(config: TrainingConfig) -> None:
             )
         training_losses.append(float(np.mean(batch_losses)))
         validation_losses.append(float(validation_loss.item()))
+        if validation_loss.item() < best_validation_loss:
+            best_validation_loss = float(validation_loss.item())
+            best_state = copy.deepcopy(model.state_dict())
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+            if epochs_without_improvement >= config.patience:
+                break
 
+    model.load_state_dict(best_state)
     model.eval()
     with torch.no_grad():
-        scaled_predictions = model(test_dataset.sequences).numpy().ravel()
+        scaled_predictions = model(validation_dataset.sequences).numpy().ravel()
     predictions = scaler.inverse_transform(
         scaled_predictions.reshape(-1, 1)
     ).ravel()
-    actual = monthly.loc[dates[test_mask], "co2"]
-    training_values = monthly.loc[:validation_end, "co2"].to_numpy()
+    actual = monthly.loc[dates[validation_mask], "co2"]
+    training_values = monthly.loc[:train_end, "co2"].to_numpy()
     metrics = {
-        "PyTorch LSTM": calculate_metrics(
+        "evidence_type": "pipeline_smoke",
+        "ranking_eligible": False,
+        "epochs_requested": config.epochs,
+        "epochs_completed": len(training_losses),
+        "best_validation_loss": best_validation_loss,
+        "validation_metrics": calculate_metrics(
             actual.to_numpy(),
             predictions,
             training_values,
-        )
+        ),
     }
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
@@ -158,13 +174,20 @@ def train(config: TrainingConfig) -> None:
         MODELS_DIR / "lstm_forecaster.pt",
     )
     save_metrics(REPORTS_DIR / "lstm_metrics.json", metrics)
-    save_prediction_artifact("PyTorch LSTM", actual.index, actual, predictions)
+    save_prediction_artifact(
+        "PyTorch LSTM smoke",
+        actual.index,
+        actual,
+        predictions,
+        evaluation_split="validation",
+        refit_at_each_origin=False,
+    )
     save_training_curve(training_losses, validation_losses)
     save_forecast_plot(
         FIGURES_DIR / "lstm_forecast.png",
-        "PyTorch LSTM forecast on the held-out test period",
+        "PyTorch LSTM pipeline-smoke predictions on validation",
         actual,
-        {"PyTorch LSTM": pd.Series(predictions, index=actual.index)},
+        {"PyTorch LSTM smoke": pd.Series(predictions, index=actual.index)},
     )
     print(f"Trained PyTorch LSTM for {config.epochs} epochs.")
 
@@ -192,6 +215,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--learning-rate", type=float, default=0.001)
     parser.add_argument("--hidden-size", type=int, default=32)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--patience", type=int, default=10)
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()
 
@@ -205,6 +229,7 @@ def main() -> None:
         learning_rate=args.learning_rate,
         hidden_size=16 if args.debug else args.hidden_size,
         seed=args.seed,
+        patience=args.patience,
     )
     train(config)
 

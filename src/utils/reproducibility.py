@@ -15,5 +15,6 @@ def set_seed(seed: int) -> None:
         return
 
     torch.manual_seed(seed)
+    torch.use_deterministic_algorithms(True)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)

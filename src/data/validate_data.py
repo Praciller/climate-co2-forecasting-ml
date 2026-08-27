@@ -3,6 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from src.data.load_co2 import load_co2_dataset
+from src.features.preprocess_timeseries import build_monthly_features
 from src.utils.config import PROJECT_ROOT, RAW_DATA_PATH, REPORTS_DIR, ensure_project_directories
 
 
@@ -24,6 +25,10 @@ def build_validation_report(frame: pd.DataFrame) -> str:
     lower, upper = q1 - 1.5 * iqr, q3 + 1.5 * iqr
     outliers = values[(values < lower) | (values > upper)]
     stats = values.describe()
+    raw_monthly = values.resample("ME").mean()
+    monthly, _ = build_monthly_features(frame)
+    missing_months = raw_monthly[raw_monthly.isna()].index
+    imputed_months = monthly.index[monthly["is_imputed"]]
 
     lines = [
         "# Data Validation Report",
@@ -36,6 +41,21 @@ def build_validation_report(frame: pd.DataFrame) -> str:
         f"- Date range: {frame.index.min().date()} to {frame.index.max().date()}",
         f"- Inferred frequency: {pd.infer_freq(frame.index[:50]) or 'irregular weekly'}",
         f"- Numeric range: {values.min():.2f} to {values.max():.2f} ppm",
+        f"- Non-positive observed values: {int((values.dropna() <= 0).sum())}",
+        f"- Monotonic ordering: {frame.index.is_monotonic_increasing}",
+        "",
+        "## Monthly Transformation",
+        "",
+        "- Aggregation: month-end mean of available weekly observations",
+        "- Missing-month strategy: causal forward fill, bounded to 3 months",
+        f"- Monthly rows: {len(monthly)}",
+        f"- Monthly date range: {monthly.index.min().date()} to {monthly.index.max().date()}",
+        f"- Missing months before fill: {len(missing_months)}",
+        f"- Missing months after fill: {int(monthly['co2'].isna().sum())}",
+        f"- Imputed months: {', '.join(timestamp.date().isoformat() for timestamp in imputed_months)}",
+        f"- Duplicate monthly timestamps: {int(monthly.index.duplicated().sum())}",
+        f"- Non-positive monthly values: {int((monthly['co2'] <= 0).sum())}",
+        f"- Frequency consistent: {pd.infer_freq(monthly.index) == 'ME'}",
         "",
         "## IQR Outlier Summary",
         "",

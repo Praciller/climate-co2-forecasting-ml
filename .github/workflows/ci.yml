@@ -14,8 +14,13 @@ jobs:
           python-version: "3.11"
           cache: pip
       - run: pip install -r requirements.txt
+      - run: ruff check src tests
+      - name: Regenerate governed evidence
+        run: python -m src.pipeline
       - run: python -m pytest
       - run: python -m compileall -q src
+      - run: python -m src.verify_repository
+      - run: docker compose config --quiet
       - name: Execute EDA notebook
         run: >-
           jupyter nbconvert
@@ -41,3 +46,4 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+      - run: npm audit --audit-level=high

@@ -1,24 +1,25 @@
 from __future__ import annotations
 
-import joblib
+import json
+
 import numpy as np
 
-from src.utils.config import MODELS_DIR
+from src.artifacts import validate_manifest
+from src.utils.config import MAX_FORECAST_HORIZON, MODEL_MANIFEST_PATH
 
 
 def forecast_future(horizon_months: int) -> tuple[str, np.ndarray]:
-    if horizon_months < 1:
-        raise ValueError("horizon_months must be positive.")
-
-    artifact_path = MODELS_DIR / "statistical_model.joblib"
-    if not artifact_path.exists():
-        raise FileNotFoundError(
-            "Statistical model is missing. Run "
-            "`python -m src.models.train_statistical` first."
+    if not 1 <= horizon_months <= MAX_FORECAST_HORIZON:
+        raise ValueError(
+            f"horizon_months must be between 1 and {MAX_FORECAST_HORIZON}."
         )
-
-    artifact = joblib.load(artifact_path)
-    return artifact["model_name"], np.asarray(
-        artifact["model"].forecast(horizon_months),
-        dtype=float,
+    _manifest, paths = validate_manifest(
+        MODEL_MANIFEST_PATH,
+        required_artifacts={"live_forecast"},
     )
+    artifact = json.loads(paths["live_forecast"].read_text(encoding="utf-8"))
+    predictions = [
+        float(row["prediction"])
+        for row in artifact["forecast"][:horizon_months]
+    ]
+    return str(artifact["model_name"]), np.asarray(predictions, dtype=float)

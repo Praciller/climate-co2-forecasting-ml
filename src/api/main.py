@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import FastAPI, Query, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.schemas import (
@@ -12,7 +13,7 @@ from src.api.schemas import (
     ForecastResponse,
     HistoricalPoint,
 )
-from src.api.service import ForecastService
+from src.api.service import ForecastService, ServiceNotReadyError
 from src.utils.config import MAX_FORECAST_HORIZON
 
 
@@ -41,14 +42,40 @@ def get_service(request: Request) -> ForecastService:
     return request.app.state.forecast_service
 
 
+@app.exception_handler(ServiceNotReadyError)
+def service_not_ready(
+    _request: Request,
+    _exc: ServiceNotReadyError,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=503,
+        content={
+            "detail": "Governed forecast artifacts are unavailable or invalid.",
+            "code": "artifact_not_ready",
+        },
+    )
+
+
 @app.get("/health")
 def health(request: Request) -> dict[str, object]:
     service = get_service(request)
     return {
         "status": "ok",
-        "model_loaded": bool(service.forecast_artifact),
+        "ready": service.ready,
+        "readiness_code": service.readiness_code,
+        "model_loaded": bool(service.forecast_artifact) and service.ready,
         "history_rows": len(service.history),
     }
+
+
+@app.get("/ready")
+def readiness(request: Request) -> JSONResponse:
+    service = get_service(request)
+    status_code = 200 if service.ready else 503
+    return JSONResponse(
+        status_code=status_code,
+        content={"ready": service.ready, "code": service.readiness_code},
+    )
 
 
 @app.get("/model-info")

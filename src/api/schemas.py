@@ -28,8 +28,16 @@ class ForecastPoint(BaseModel):
 
 class ForecastResponse(BaseModel):
     model: str
+    model_version: str
+    forecast_origin: date
     horizon_months: int = Field(ge=1)
+    frequency: str
+    protocol: str
+    interval_method: str
+    interval_nominal_coverage: float = Field(gt=0, lt=1)
+    interval_coverage_scope: str
     generated_at: datetime
+    limitations: list[str]
     forecast: list[ForecastPoint]
 
     @model_validator(mode="after")
@@ -42,6 +50,8 @@ class ForecastResponse(BaseModel):
 class AnomalyPoint(BaseModel):
     date: date
     co2: float
+    residual_ppm: float | None = None
     residual_anomaly: bool
+    isolation_score: float | None = None
     isolation_forest_anomaly: bool
     methods: list[str]

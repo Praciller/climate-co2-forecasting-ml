@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import warnings
-from datetime import UTC, datetime
 
 import joblib
 import numpy as np
@@ -18,12 +17,9 @@ from src.models.common import (
 )
 from src.utils.config import (
     FIGURES_DIR,
-    LIVE_FORECAST_PATH,
-    MAX_FORECAST_HORIZON,
     MODELS_DIR,
     REPORTS_DIR,
 )
-from src.utils.io import write_json
 
 
 def fit_exponential_smoothing(series: pd.Series):
@@ -38,7 +34,7 @@ def fit_exponential_smoothing(series: pd.Series):
 
 def fit_sarima(series: pd.Series):
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+        warnings.simplefilter("default")
         return SARIMAX(
             series,
             order=(1, 1, 1),
@@ -77,85 +73,58 @@ def rolling_sarima(history: pd.Series, test: pd.Series) -> np.ndarray:
     return np.asarray(predictions)
 
 
-def save_live_forecast_artifact(
-    model_name: str,
-    model: object,
-    history: pd.Series,
-) -> None:
-    predictions = np.asarray(model.forecast(MAX_FORECAST_HORIZON), dtype=float)
-    dates = pd.date_range(
-        history.index.max() + pd.offsets.MonthEnd(1),
-        periods=MAX_FORECAST_HORIZON,
-        freq="ME",
-    )
-    residuals = history - model.fittedvalues
-    residual_std = max(float(residuals.dropna().std(ddof=0)), 0.1)
-    write_json(
-        LIVE_FORECAST_PATH,
-        {
-            "model_name": model_name,
-            "generated_at": datetime.now(UTC).isoformat(),
-            "training_rows": len(history),
-            "training_end": history.index.max().date().isoformat(),
-            "residual_std": residual_std,
-            "forecast": [
-                {
-                    "date": forecast_date.date().isoformat(),
-                    "prediction": float(prediction),
-                }
-                for forecast_date, prediction in zip(
-                    dates,
-                    predictions,
-                    strict=True,
-                )
-            ],
-        },
-    )
-
-
 def main() -> None:
     monthly, features = load_modeling_data()
-    test_dates = features.index[features["split"] == "test"]
-    train_series = monthly.loc[monthly.index < test_dates.min(), "co2"]
-    test = monthly.loc[test_dates, "co2"]
-
-    prediction_values = {
-        "Exponential Smoothing": rolling_exponential_smoothing(train_series, test),
-        "SARIMA": rolling_sarima(train_series, test),
-    }
     metrics = {}
     predictions = {}
 
-    for model_name, values in prediction_values.items():
-        metrics[model_name] = calculate_metrics(
-            test.to_numpy(),
-            values,
-            train_series.to_numpy(),
-        )
-        save_prediction_artifact(model_name, test.index, test, values)
-        predictions[model_name] = pd.Series(values, index=test.index)
+    for split_name in ("validation", "test"):
+        target_dates = features.index[features["split"] == split_name]
+        history = monthly.loc[monthly.index < target_dates.min(), "co2"]
+        target = monthly.loc[target_dates, "co2"]
+        prediction_values = {
+            "Exponential Smoothing": rolling_exponential_smoothing(
+                history,
+                target,
+            ),
+            "SARIMA": rolling_sarima(history, target),
+        }
+        split_metrics = {}
+        for model_name, values in prediction_values.items():
+            split_metrics[model_name] = calculate_metrics(
+                target.to_numpy(),
+                values,
+                history.to_numpy(),
+            )
+            save_prediction_artifact(
+                model_name,
+                target.index,
+                target,
+                values,
+                evaluation_split=split_name,
+                refit_at_each_origin=model_name == "Exponential Smoothing",
+            )
+            if split_name == "test":
+                predictions[model_name] = pd.Series(values, index=target.index)
+        metrics[split_name] = split_metrics
 
-    best_name = min(metrics, key=lambda name: metrics[name]["mae"])
-    full_series = monthly["co2"]
-    best_model = (
-        fit_exponential_smoothing(full_series)
-        if best_name == "Exponential Smoothing"
-        else fit_sarima(full_series)
-    )
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
-    joblib.dump(
-        {"model_name": best_name, "model": best_model},
-        MODELS_DIR / "statistical_model.joblib",
-    )
-    save_live_forecast_artifact(best_name, best_model, full_series)
+    for model_name, model in (
+        ("Exponential Smoothing", fit_exponential_smoothing(monthly["co2"])),
+        ("SARIMA", fit_sarima(monthly["co2"])),
+    ):
+        joblib.dump(
+            {"model_name": model_name, "model": model},
+            MODELS_DIR / f"{model_name.lower().replace(' ', '_')}.joblib",
+        )
     save_metrics(REPORTS_DIR / "statistical_metrics.json", metrics)
     save_forecast_plot(
         FIGURES_DIR / "statistical_forecast.png",
-        "Statistical forecasts on the held-out test period",
-        test,
+        "Statistical rolling one-step forecasts on the final test period",
+        target,
         predictions,
     )
-    print(f"Trained statistical models. Best by MAE: {best_name}.")
+    print("Generated validation and final-test evidence for statistical models.")
 
 
 if __name__ == "__main__":

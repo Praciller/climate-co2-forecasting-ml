@@ -1,0 +1,22 @@
+{
+  "method": "development rolling-origin absolute-residual quantile",
+  "nominal_coverage": 0.9,
+  "empirical_coverage": 0.9102564102564102,
+  "observed_test_coverage": 0.9102564102564102,
+  "covered_samples": 71,
+  "calibration_split": "train/validation development folds",
+  "calibration_end": "1995-06-30",
+  "calibration_samples": 77,
+  "evaluation_split": "final_test",
+  "evaluation_samples": 78,
+  "average_width_ppm": 1.0113001093172898,
+  "radius_ppm": 0.5056500546586449,
+  "horizon_behavior": {
+    "1": {
+      "samples": 78,
+      "empirical_coverage": 0.9102564102564102,
+      "average_width_ppm": 1.0113001093172898
+    }
+  },
+  "limitations": "This is a measured one-step prediction interval from development residuals. Fold residuals are time-dependent and may not be exchangeable; coverage is empirical for this historical final-test period and is not established for multi-step serving horizons."
+}

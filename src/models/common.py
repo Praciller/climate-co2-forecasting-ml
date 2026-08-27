@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from typing import Any
 
 import matplotlib
 import numpy as np
@@ -49,21 +50,40 @@ def save_prediction_artifact(
     dates: pd.DatetimeIndex,
     actual: np.ndarray | pd.Series,
     prediction: np.ndarray | pd.Series,
+    *,
+    evaluation_split: str,
+    refit_at_each_origin: bool,
 ) -> Path:
     PREDICTIONS_DIR.mkdir(parents=True, exist_ok=True)
-    path = PREDICTIONS_DIR / f"{slugify_model_name(model_name)}.csv"
+    if evaluation_split not in {"validation", "test"}:
+        raise ValueError("evaluation_split must be validation or test.")
+    output_dir = (
+        PREDICTIONS_DIR
+        if evaluation_split == "test"
+        else PREDICTIONS_DIR / evaluation_split
+    )
+    output_dir.mkdir(parents=True, exist_ok=True)
+    path = output_dir / f"{slugify_model_name(model_name)}.csv"
+    origins = pd.DatetimeIndex(dates) - pd.offsets.MonthEnd(1)
     frame = pd.DataFrame(
         {
             "date": dates,
+            "origin_date": origins,
+            "horizon": 1,
+            "evaluation_split": evaluation_split,
+            "protocol": "rolling-origin one-step-ahead",
+            "refit_at_origin": refit_at_each_origin,
             "actual": np.asarray(actual, dtype=float),
             "prediction": np.asarray(prediction, dtype=float),
         }
     )
+    if frame["date"].duplicated().any():
+        raise ValueError("Prediction artifact contains duplicate target dates.")
     frame.to_csv(path, index=False)
     return path
 
 
-def save_metrics(path: Path, metrics: dict[str, dict[str, float]]) -> None:
+def save_metrics(path: Path, metrics: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
 
