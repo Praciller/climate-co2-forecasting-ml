@@ -5,6 +5,16 @@ machine-learning, and neural approaches through chronological rolling
 evaluation, governs forecast intervals and model artifacts, and serves bounded
 exploratory analysis through FastAPI and React.
 
+## Recruiter snapshot
+
+**Signal:** Leakage-safe CO₂ forecasting with chronological backtesting, interval evaluation, anomaly signals, and reproducible evidence.
+
+[Repository](https://github.com/Praciller/climate-co2-forecasting-ml)
+
+**What this demonstrates:** temporal split discipline · governed artifacts and intervals · bounded API/dashboard delivery.
+
+**Boundary:** reproducible portfolio evidence over a historical dataset; it is not a production forecast or current atmospheric feed.
+
 - **Governed evidence:** 359 training, 77 validation, and 78 final-test feature
   rows with fixed, non-overlapping date boundaries.
 - **Selection without test leakage:** SARIMA is selected across 11 development
