@@ -1,0 +1,75 @@
+name: Bug / Regression
+description: Report a reproducible defect with evidence and regression criteria.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste secrets, tokens, private credentials, or sensitive environment values into an issue.
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: What happened? Include the smallest useful evidence.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened according to the current spec/docs/contract?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Give deterministic steps/commands and inputs where possible.
+      placeholder: |
+        1. Run ...
+        2. Open / call ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add sanitized logs, stack traces, screenshots, failing test output, report paths, or commit SHA. Never include secrets.
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impact area
+      options:
+        - label: Data lineage / preprocessing
+        - label: Temporal leakage / split semantics
+        - label: Model training / evaluation
+        - label: Forecast interval / anomaly semantics
+        - label: Artifact governance / readiness
+        - label: API behavior
+        - label: Frontend / accessibility / visualization
+        - label: CI / container / dependency
+        - label: Documentation only
+
+  - type: textarea
+    id: regression
+    attributes:
+      label: Regression acceptance criteria
+      description: Define the test/evidence that proves the bug is fixed without breaking documented invariants.
+      placeholder: |
+        - Given the minimal reproduction, when ..., then ...
+        - A regression test fails before the fix and passes after it.
+        - Relevant repository verification remains green.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Relevant ADR/docs/issue links, environment details, or suspected boundary. Avoid implementation speculation if unknown.
