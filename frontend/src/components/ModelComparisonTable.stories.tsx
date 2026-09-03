@@ -13,7 +13,7 @@ type Story = StoryObj<typeof meta>
 
 export const SelectedByDevelopment: Story = {
   args: {
-    bestModel: 'SARIMA',
+    selectedModel: 'SARIMA',
     models: {
       SARIMA: { mae: 0.243, rmse: 0.298, mape: 0.1, smape: 0.2, mase: 0.197 },
       'Exponential Smoothing': {

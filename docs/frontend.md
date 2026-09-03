@@ -54,4 +54,15 @@ the a11y addon configured to fail on violations.
 This issue intentionally does not add full application Playwright E2E or visual
 regression tooling. Those checks belong to the later browser-quality issue.
 
+## Issue #6 design audit
+
+| Surface | Design problem addressed | Resulting behavior |
+|---|---|---|
+| Overview | Selection, evaluation, interval, and scope were mixed together | Historical scope, development-selected model, final-test winner, measured coverage, provenance, and limitations are visible together |
+| Data Explorer | Preparation lineage was partly hard-coded and live scope was implicit | Dataset/preprocessing metadata comes from `/model-info`; historical-only status is explicit |
+| Forecasting | Protocol and interval language was inaccurate or buried | Fixed-origin origin, horizon, 90% prediction interval, method, and one-step coverage boundary are adjacent to the chart |
+| Anomaly Detection | Amber markers did not distinguish methods | Isolation Forest and residual signals have distinct marker treatments plus text labels and agreement counts |
+| Model Evaluation | Final-test winner was labeled as the selected model | Development selection and final-test ranking are separate API-derived sections and table labels |
+| AppShell/charts | Active state and chart semantics relied too much on color | Active navigation has borders/ARIA state; charts have legends, units, origin annotation, and token-based colors |
+
 Set `VITE_API_URL` to override the default `http://localhost:8000`.

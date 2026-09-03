@@ -118,3 +118,24 @@ PARTIAL with 4 API/readiness failures because `reports/model_manifest.json` is
 absent in this clean feature worktree, and `python -m src.verify_repository`
 fails closed for the same missing governed manifest. No model, data, or report
 artifact was changed for Issue #5.
+
+## Issue #6 dashboard design refactor
+
+The dashboard was reviewed against `DESIGN.md` with the real local API and Vite
+frontend on September 4, 2026. The browser pass covered all five pages at
+1440-by-900 desktop and 390-by-844 mobile viewports. Each page loaded API-backed
+historical/model/anomaly/forecast data, exposed exactly one active navigation
+item, kept document and body width within the viewport, and produced no
+page-error or console-error output. Mobile comparison and forecast tables use
+bounded horizontal scrolling rather than overflowing the page.
+
+The review also checked keyboard navigation from the document body, visible
+focus rings, method-specific anomaly labels/markers, the fixed-origin forecast
+origin, the 90% nominal interval boundary, and the development-selection versus
+final-test distinction. Screenshots were captured outside the repository for
+review; no screenshot or generated pipeline artifact is committed by Issue #6.
+
+The frontend contract now mirrors the nested `/model-info` response and the
+metadata-bearing `/forecast` response. The UI does not claim current-data
+monitoring, multi-horizon interval coverage, or final-test-driven model
+selection.

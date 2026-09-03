@@ -12,6 +12,9 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 export default mergeConfig(
   viteConfig,
   defineConfig({
+    optimizeDeps: {
+      include: ['recharts'],
+    },
     test: {
       projects: [
         {

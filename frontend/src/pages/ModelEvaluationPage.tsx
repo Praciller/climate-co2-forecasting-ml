@@ -8,43 +8,79 @@ interface ModelEvaluationPageProps {
 }
 
 export function ModelEvaluationPage({ modelInfo }: ModelEvaluationPageProps) {
-  const models = modelInfo.metrics.models ?? {}
-  const bestModel = modelInfo.metrics.best_model
-  const bestMetrics = bestModel ? models[bestModel] : undefined
+  const selectedModel = modelInfo.selection.selected_model
+  const models = modelInfo.metrics.final_test.models
+  const finalTestWinnerEntry = Object.entries(models).sort(
+    ([, left], [, right]) => left.mae - right.mae,
+  )[0]
+  const finalTestWinner = finalTestWinnerEntry?.[0]
+  const finalTestWinnerMetrics = finalTestWinnerEntry?.[1]
+  const developmentMae =
+    modelInfo.metrics.rolling_origin.aggregate[selectedModel]?.mae.mean
 
   return (
     <div className="space-y-9">
       <header>
         <h2 className="text-2xl font-semibold tracking-tight">
-          Held-out model evaluation
+          Selection and held-out evaluation
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-muted">
-          Baseline, statistical, tree-based, and deep-learning forecasts use
-          the same chronological test months. MASE below 1 beats the seasonal
-          naive scale.
+          Development rolling-origin folds select the serving model. The
+          untouched final test evaluates every candidate once afterward; its
+          lowest score does not change the selection decision.
         </p>
       </header>
-      <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
-        <MetricCard label="Best model" value={bestModel ?? 'Pending'} />
-        <MetricCard label="MAE" value={bestMetrics?.mae.toFixed(3) ?? 'Pending'} />
+      <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         <MetricCard
-          label="RMSE"
-          value={bestMetrics?.rmse.toFixed(3) ?? 'Pending'}
+          label="Selected model"
+          value={selectedModel}
+          detail={`Selected by ${modelInfo.metrics.rolling_origin.fold_count} rolling-origin development folds`}
         />
         <MetricCard
-          label="sMAPE"
-          value={bestMetrics ? `${bestMetrics.smape.toFixed(3)}%` : 'Pending'}
+          label="Development mean MAE"
+          value={developmentMae?.toFixed(3) ?? '—'}
+          detail="Selection evidence · ppm"
         />
         <MetricCard
-          label="MASE"
-          value={bestMetrics?.mase.toFixed(3) ?? 'Pending'}
+          label="Lowest final-test MAE"
+          value={finalTestWinnerMetrics?.mae.toFixed(3) ?? '—'}
+          detail={`${finalTestWinner ?? 'Unavailable'} · ${modelInfo.metrics.final_test.samples} held-out months · ppm`}
         />
       </section>
-      <section>
-        <h3 className="section-heading">Comparison table</h3>
-        <div className="mt-4">
-          <ModelComparisonTable bestModel={bestModel} models={models} />
+      <section className="grid gap-5 border-y border-rule py-6 md:grid-cols-2">
+        <div>
+          <h3 className="section-heading">Development selection</h3>
+          <p className="mt-2 text-sm leading-6 text-ink-muted">
+            <strong className="text-ink">{selectedModel}</strong> was selected
+            using {modelInfo.selection.metric}. {modelInfo.selection.rationale}
+          </p>
         </div>
+        <div>
+          <h3 className="section-heading">Final-test evaluation</h3>
+          <p className="mt-2 text-sm leading-6 text-ink-muted">
+            {finalTestWinner ? (
+              <>
+                <strong className="text-ink">{finalTestWinner}</strong> has the
+                lowest final-test MAE. This is post-selection evaluation, not a
+                new model-selection decision.
+              </>
+            ) : (
+              'Final-test metrics are unavailable.'
+            )}
+          </p>
+        </div>
+      </section>
+      <section>
+        <h3 className="section-heading">Final-test comparison</h3>
+        <div className="mt-4">
+          <ModelComparisonTable selectedModel={selectedModel} models={models} />
+        </div>
+        <p className="mt-3 text-xs leading-5 text-ink-muted">
+          Metrics are final-test evidence for the locked period of{' '}
+          {modelInfo.metrics.final_test.start} through{' '}
+          {modelInfo.metrics.final_test.end}. MASE below 1 beats the seasonal
+          naive scale.
+        </p>
       </section>
       <section className="grid gap-6 xl:grid-cols-2">
         <div>
@@ -52,7 +88,7 @@ export function ModelEvaluationPage({ modelInfo }: ModelEvaluationPageProps) {
           <div className="mt-4">
             <ResidualPlotViewer
               src="/reports/residual_plot.png"
-              alt={`Residual timeline for ${bestModel ?? 'the best model'}`}
+              alt={`Residual timeline for the selected model ${selectedModel}`}
             />
           </div>
         </div>
@@ -61,7 +97,7 @@ export function ModelEvaluationPage({ modelInfo }: ModelEvaluationPageProps) {
           <div className="mt-4">
             <ResidualPlotViewer
               src="/reports/error_distribution.png"
-              alt={`Error distribution for ${bestModel ?? 'the best model'}`}
+              alt={`Error distribution for the selected model ${selectedModel}`}
             />
           </div>
         </div>

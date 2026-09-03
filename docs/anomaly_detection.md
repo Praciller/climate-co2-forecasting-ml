@@ -16,7 +16,9 @@ Isolation Forest uses observed lag, rolling, and calendar features. It is fitted
 
 ## Interpretation
 
-The current run flags 16 months through Isolation Forest and zero through the residual threshold. These are exploratory feature-space signals, not verified climate events, sensor failures, or causal attributions.
+The current governed evidence flags 8 months through Isolation Forest and zero
+through the residual threshold. These are exploratory feature-space signals,
+not verified climate events, sensor failures, or causal attributions.
 
 ## Output
 

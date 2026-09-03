@@ -11,6 +11,7 @@ describe('ErrorMessage', () => {
 
     render(<ErrorMessage message="API data is unavailable." onRetry={onRetry} />)
 
+    expect(screen.getByRole('alert')).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Forecasting API unavailable' })).toBeVisible()
     expect(screen.getByText(/API data is unavailable/)).toBeVisible()
     await user.click(screen.getByRole('button', { name: 'Retry connection' }))

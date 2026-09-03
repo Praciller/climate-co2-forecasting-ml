@@ -3,6 +3,8 @@ import {
   CartesianGrid,
   ComposedChart,
   Line,
+  Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -14,9 +16,16 @@ import type { ForecastPoint, HistoricalPoint } from '../types/api'
 interface ForecastChartProps {
   historical: HistoricalPoint[]
   forecast: ForecastPoint[]
+  forecastOrigin: string
+  intervalNominalCoverage: number
 }
 
-export function ForecastChart({ forecast, historical }: ForecastChartProps) {
+export function ForecastChart({
+  forecast,
+  forecastOrigin,
+  historical,
+  intervalNominalCoverage,
+}: ForecastChartProps) {
   const recentHistory = historical.slice(-60).map((point) => ({
     date: point.date,
     actual: point.co2,
@@ -42,7 +51,7 @@ export function ForecastChart({ forecast, historical }: ForecastChartProps) {
     <div
       className="h-[390px] min-w-0"
       role="img"
-      aria-label="Historical CO2 and future forecast"
+      aria-label={`Historical CO2 and fixed-origin forecast from ${forecastOrigin}`}
     >
       <ResponsiveContainer
         width="100%"
@@ -51,51 +60,76 @@ export function ForecastChart({ forecast, historical }: ForecastChartProps) {
         initialDimension={{ width: 800, height: 390 }}
       >
         <ComposedChart data={data} margin={{ top: 12, right: 10, left: 0, bottom: 8 }}>
-          <CartesianGrid stroke="oklch(0.875 0.014 240)" strokeDasharray="3 5" />
+          <CartesianGrid stroke="var(--color-rule)" strokeDasharray="3 5" />
           <XAxis
             dataKey="date"
             minTickGap={45}
-            tick={{ fill: 'oklch(0.5 0.025 245)', fontSize: 11 }}
+            tick={{ fill: 'var(--color-ink-muted)', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={[yMin, yMax]}
             width={48}
-            tick={{ fill: 'oklch(0.5 0.025 245)', fontSize: 11 }}
+            tickFormatter={(value) => Number(value).toFixed(1)}
+            tick={{ fill: 'var(--color-ink-muted)', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
-            formatter={(value, name) => [
-              `${Number(value).toFixed(2)} ppm`,
-              name,
-            ]}
+            formatter={(value, name) => {
+              if (Array.isArray(value)) {
+                return [
+                  `${Number(value[0]).toFixed(2)}–${Number(value[1]).toFixed(2)} ppm`,
+                  `${intervalNominalCoverage * 100}% prediction interval`,
+                ]
+              }
+              return [`${Number(value).toFixed(2)} ppm`, name]
+            }}
             contentStyle={{ fontSize: 12 }}
             wrapperClassName="chart-tooltip"
+          />
+          <Legend
+            verticalAlign="top"
+            height={28}
+            wrapperStyle={{ fontSize: 12, color: 'var(--color-ink-muted)' }}
           />
           <Area
             type="monotone"
             dataKey="interval"
-            fill="oklch(0.57 0.14 238 / 0.14)"
+            fill="var(--color-accent-soft)"
+            fillOpacity={0.8}
             stroke="transparent"
-            name="95% interval"
+            name={`${intervalNominalCoverage * 100}% prediction interval`}
           />
           <Line
             type="monotone"
             dataKey="actual"
-            stroke="oklch(0.245 0.025 245)"
+            stroke="var(--color-ink-muted)"
             strokeWidth={2}
             dot={false}
+            name="Historical observations"
             connectNulls
           />
           <Line
             type="monotone"
             dataKey="prediction"
-            stroke="oklch(0.57 0.14 238)"
+            stroke="var(--color-accent)"
             strokeWidth={2.2}
             dot={false}
+            name="Fixed-origin forecast"
             connectNulls
+          />
+          <ReferenceLine
+            x={forecastOrigin}
+            stroke="var(--color-accent)"
+            strokeDasharray="4 4"
+            label={{
+              value: 'Forecast origin',
+              fill: 'var(--color-accent)',
+              fontSize: 11,
+              position: 'insideTopRight',
+            }}
           />
         </ComposedChart>
       </ResponsiveContainer>

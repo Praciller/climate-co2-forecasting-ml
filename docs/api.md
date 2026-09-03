@@ -18,7 +18,12 @@ Returns service status, loaded-model status, and history row count.
 
 ### `GET /model-info`
 
-Returns active forecast method, training range, available model names, and generated evaluation metrics.
+Returns the governed model/evidence contract: active model and version,
+historical dataset metadata, preprocessing and split boundaries, the fixed
+forecasting/rolling-evaluation protocols, development selection rationale,
+interval metadata, candidate names, training metadata, and nested validation
+and final-test metrics. The selected model is defined by development
+rolling-origin evidence; final-test metrics are post-selection evaluation.
 
 ### `GET /historical-data`
 
@@ -26,7 +31,10 @@ Returns monthly dates, CO2 values, and trailing 12-month means.
 
 ### `GET /forecast?horizon_months=24`
 
-Returns 1-60 future monthly points with prediction, lower, and upper values. Invalid horizons return FastAPI validation errors.
+Returns 1-60 future monthly points with prediction, lower, and upper values,
+plus model version, forecast origin, frequency, fixed-origin protocol, 90%
+prediction-interval metadata, coverage scope, generation time, and explicit
+limitations. Invalid horizons return FastAPI validation errors.
 
 ### `GET /anomalies`
 

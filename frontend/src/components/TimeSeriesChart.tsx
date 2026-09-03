@@ -2,6 +2,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -40,19 +41,19 @@ export function TimeSeriesChart({
         initialDimension={{ width: 800, height }}
       >
         <LineChart data={data} margin={{ top: 12, right: 10, bottom: 6, left: 0 }}>
-          <CartesianGrid stroke="oklch(0.875 0.014 240)" strokeDasharray="3 5" />
+          <CartesianGrid stroke="var(--color-rule)" strokeDasharray="3 5" />
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
             minTickGap={48}
-            tick={{ fill: 'oklch(0.5 0.025 245)', fontSize: 11 }}
+            tick={{ fill: 'var(--color-ink-muted)', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={['dataMin - 3', 'dataMax + 3']}
             width={48}
-            tick={{ fill: 'oklch(0.5 0.025 245)', fontSize: 11 }}
+            tick={{ fill: 'var(--color-ink-muted)', fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             unit=" ppm"
@@ -66,20 +67,27 @@ export function TimeSeriesChart({
             contentStyle={{ fontSize: 12 }}
             wrapperClassName="chart-tooltip"
           />
+          <Legend
+            verticalAlign="top"
+            height={28}
+            wrapperStyle={{ fontSize: 12, color: 'var(--color-ink-muted)' }}
+          />
           <Line
             type="monotone"
             dataKey="co2"
-            stroke="oklch(0.57 0.14 238)"
+            stroke="var(--color-ink-muted)"
             strokeWidth={1.8}
             dot={false}
+            name="Monthly observations"
           />
           {showRollingMean ? (
             <Line
               type="monotone"
               dataKey="rolling_mean_12"
-              stroke="oklch(0.42 0.05 245)"
+              stroke="var(--color-ink)"
               strokeWidth={2.2}
               dot={false}
+              name="12-month rolling mean"
               connectNulls
             />
           ) : null}
