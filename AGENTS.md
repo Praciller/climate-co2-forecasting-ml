@@ -81,11 +81,18 @@ jupyter nbconvert --to notebook --execute notebooks/01_eda.ipynb --output execut
 cd frontend
 npm ci
 npm run lint
+npm run test
 npm run build
+npm run build-storybook
+npx playwright install --with-deps chromium
+npm run test:storybook
 npm audit --audit-level=high
 ```
 
-Run any additional test, Storybook, accessibility, or E2E scripts that exist after the SDLC quality-gate work lands.
+`npm run test` runs the jsdom Testing Library suite. `npm run test:storybook`
+runs the official Storybook Vitest browser project, including configured a11y
+checks. The browser install is required on clean CI runners. Full application
+E2E and visual regression remain a later issue scope.
 
 ### Container contract
 
@@ -114,6 +121,20 @@ Preferred flow when available:
 - Matt Pocock skills: repository setup/context → clarify with docs → spec/tickets → TDD/implementation → code review/research/architecture as needed.
 - 9arm skills: use debugging, scrutiny, postmortem, context-control, Qwen delegation, or management communication only for matching work.
 - `/graftify`: use only if the installed skill can be identified from a trusted source and its behavior is appropriate for the task; never auto-install an unverified package merely because the name appears in a prompt.
+
+## Agent skills
+
+### Issue tracker
+
+Issues for this repository live in GitHub Issues and use the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the canonical `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix` labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository using root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
 
 ## Definition of done
 

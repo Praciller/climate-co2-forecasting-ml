@@ -86,3 +86,35 @@ Updated screenshots are stored in `reports/screenshots/`.
   errors or climate events.
 - No production deployment, external monitoring, or current-data ingestion was
   verified.
+
+## Issue #5 frontend quality foundation
+
+The `feat/frontend-quality-foundation` branch adds a clean-install frontend
+quality gate for representative shared components. It uses Vitest, jsdom,
+Testing Library, Storybook, the official Vitest addon, and the official a11y
+addon. The browser check is limited to isolated Storybook stories; full
+application E2E and visual regression remain later issue scope.
+
+Run from `frontend/`:
+
+```text
+npm ci
+npm run lint
+npm run test
+npm run build
+npm run build-storybook
+npx playwright install --with-deps chromium
+npm run test:storybook
+npm audit --audit-level=high
+```
+
+The CI frontend job runs the same checks. The unit suite covers MetricCard,
+LoadingState, ErrorMessage, ModelComparisonTable, and AppShell. Storybook
+stories cover those components and enforce configured accessibility checks.
+
+Backend checks were also run without regenerating evidence: `ruff check src
+tests` and `python -m compileall -q src` passed. `python -m pytest -q` remains
+PARTIAL with 4 API/readiness failures because `reports/model_manifest.json` is
+absent in this clean feature worktree, and `python -m src.verify_repository`
+fails closed for the same missing governed manifest. No model, data, or report
+artifact was changed for Issue #5.

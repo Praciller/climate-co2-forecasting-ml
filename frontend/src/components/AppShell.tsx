@@ -113,6 +113,7 @@ export function AppShell({
                     ? 'bg-accent-soft text-accent'
                     : 'text-ink-muted'
                 }`}
+                aria-current={activePage === id ? 'page' : undefined}
               >
                 {label}
               </button>
