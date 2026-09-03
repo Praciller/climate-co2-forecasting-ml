@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest'
 import { ModelComparisonTable } from './ModelComparisonTable'
 
 describe('ModelComparisonTable', () => {
-  it('renders numeric model rows and names the selected best-MAE model', () => {
+  it('keeps development selection separate from final-test ranking', () => {
     render(
       <ModelComparisonTable
-        bestModel="SARIMA"
+        selectedModel="SARIMA"
         models={{
           SARIMA: { mae: 0.243, rmse: 0.298, mape: 0.1, smape: 0.2, mase: 0.197 },
           'Exponential Smoothing': {
@@ -27,7 +27,9 @@ describe('ModelComparisonTable', () => {
     expect(within(rows[1]).getAllByRole('cell')[0]).toHaveTextContent(
       'Exponential Smoothing',
     )
-    expect(screen.getByText('Best MAE')).toBeVisible()
+    expect(within(rows[1]).getByText('Lowest final-test MAE')).toBeVisible()
+    expect(within(rows[2]).getByText('Selected by development')).toBeVisible()
+    expect(screen.queryByText('Best MAE')).not.toBeInTheDocument()
     expect(within(table).getByText('0.100%')).toBeVisible()
   })
 })

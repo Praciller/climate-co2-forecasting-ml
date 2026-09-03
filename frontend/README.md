@@ -29,5 +29,7 @@ npm audit --audit-level=high
   the a11y addon configured to fail on accessibility violations.
 
 The Issue #5 foundation covers MetricCard, LoadingState, ErrorMessage,
-ModelComparisonTable, and AppShell. Full application E2E and visual regression
+ModelComparisonTable, and AppShell. Issue #6 adds contract-accurate page
+fixtures, model-evaluation and forecast behavior tests, and Storybook states
+for the chart components. Full application E2E and committed visual regression
 are intentionally deferred to the later browser-quality issue.

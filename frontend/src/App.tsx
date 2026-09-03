@@ -35,7 +35,12 @@ function App() {
       />
     )
   } else if (page === 'data') {
-    content = <DataExplorerPage historical={data.historical} />
+    content = (
+      <DataExplorerPage
+        historical={data.historical}
+        modelInfo={data.modelInfo}
+      />
+    )
   } else if (page === 'forecasting') {
     content = <ForecastingPage historical={data.historical} />
   } else if (page === 'anomalies') {

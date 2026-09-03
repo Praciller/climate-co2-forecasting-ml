@@ -57,10 +57,10 @@ export function AppShell({
               key={id}
               type="button"
               onClick={() => onNavigate(id)}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+              className={`flex min-h-11 w-full items-center gap-3 rounded-lg border-l-2 px-3 py-2.5 text-left text-sm transition-colors ${
                 activePage === id
-                  ? 'bg-accent-soft text-accent'
-                  : 'text-ink-muted hover:bg-surface-muted hover:text-ink'
+                  ? 'border-accent bg-accent-soft font-semibold text-accent'
+                  : 'border-transparent font-medium text-ink-muted hover:bg-surface-muted hover:text-ink'
               }`}
               aria-current={activePage === id ? 'page' : undefined}
             >
@@ -85,7 +85,11 @@ export function AppShell({
               </p>
               <h1 className="text-lg font-semibold tracking-tight">{pageTitle}</h1>
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-ink-muted">
+            <div
+              className="flex items-center gap-2 text-[11px] font-medium text-ink-muted sm:text-xs"
+              role="status"
+              aria-live="polite"
+            >
               <span
                 className={`size-2 rounded-full ${
                   apiStatus === 'connected'
@@ -108,10 +112,10 @@ export function AppShell({
                 key={id}
                 type="button"
                 onClick={() => onNavigate(id)}
-                className={`shrink-0 rounded-md px-3 py-2 text-xs font-semibold ${
+                className={`min-h-11 shrink-0 rounded-md border px-3 py-2 text-xs font-semibold ${
                   activePage === id
-                    ? 'bg-accent-soft text-accent'
-                    : 'text-ink-muted'
+                    ? 'border-accent bg-accent-soft text-accent'
+                    : 'border-transparent text-ink-muted'
                 }`}
                 aria-current={activePage === id ? 'page' : undefined}
               >

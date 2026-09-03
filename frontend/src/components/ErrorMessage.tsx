@@ -7,7 +7,10 @@ interface ErrorMessageProps {
 
 export function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
   return (
-    <section className="mx-auto mt-16 max-w-xl rounded-xl border border-rule bg-surface p-8 text-center">
+    <section
+      className="mx-auto mt-16 max-w-xl rounded-xl border border-rule bg-surface p-8 text-center"
+      role="alert"
+    >
       <CircleAlert className="mx-auto text-danger" size={30} aria-hidden="true" />
       <h2 className="mt-4 text-xl font-semibold">Forecasting API unavailable</h2>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-muted">
