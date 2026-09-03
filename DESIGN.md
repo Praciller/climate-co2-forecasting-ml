@@ -10,7 +10,7 @@ colors:
   ink: "oklch(0.245 0.025 245)"
   inkMuted: "oklch(0.500 0.025 245)"
   rule: "oklch(0.875 0.014 240)"
-  accent: "oklch(0.570 0.140 238)"
+  accent: "oklch(0.480 0.120 238)"
   accentSoft: "oklch(0.920 0.040 238)"
   anomaly: "oklch(0.680 0.150 65)"
   success: "oklch(0.580 0.120 155)"

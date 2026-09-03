@@ -7,7 +7,7 @@
   --color-ink: oklch(0.245 0.025 245);
   --color-ink-muted: oklch(0.5 0.025 245);
   --color-rule: oklch(0.875 0.014 240);
-  --color-accent: oklch(0.57 0.14 238);
+  --color-accent: oklch(0.48 0.12 238);
   --color-accent-soft: oklch(0.92 0.04 238);
   --color-anomaly: oklch(0.68 0.15 65);
   --color-success: oklch(0.58 0.12 155);
