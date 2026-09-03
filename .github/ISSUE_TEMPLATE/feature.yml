@@ -1,0 +1,87 @@
+name: Feature / Improvement
+description: Plan a reviewable vertical slice with explicit acceptance criteria.
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for a coherent reviewer-visible outcome. Keep the slice small enough to implement, verify, and review in one PR when practical.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / opportunity
+      description: What reviewer/user problem are we solving? State evidence and boundaries, not an implementation guess.
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What observable outcome should exist when this is complete?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included in this slice?
+      placeholder: |
+        - Included ...
+        - Included ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What must this issue deliberately not expand into?
+      placeholder: |
+        - Not ...
+        - Not ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Prefer Given / When / Then for observable behavior. Include verification evidence expected before merge.
+      placeholder: |
+        - Given ..., when ..., then ...
+        - Given ..., when ..., then ...
+        - Relevant tests/checks pass and evidence is attached to the PR.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: layers
+    attributes:
+      label: Affected areas
+      options:
+        - label: Data / preprocessing
+        - label: Modeling / evaluation
+        - label: Anomaly analysis
+        - label: API / serving
+        - label: Frontend / design system
+        - label: CI / security / tooling
+        - label: Documentation / ADR
+
+  - type: textarea
+    id: invariants
+    attributes:
+      label: Domain / safety invariants
+      description: List any constraints from CONTEXT.md, DESIGN.md, API contracts, or ADRs that the implementation must preserve.
+      placeholder: |
+        - No temporal leakage.
+        - Final test remains untouched by selection/tuning.
+        - UI claim remains within documented evidence scope.
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References / context
+      description: Link relevant docs, ADRs, screenshots, reports, code, or research.

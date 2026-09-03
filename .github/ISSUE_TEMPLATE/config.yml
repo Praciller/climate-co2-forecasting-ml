@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security concern
+    url: https://github.com/Praciller/climate-co2-forecasting-ml/security
+    about: Please use the repository Security area for sensitive vulnerability reports; do not post secrets publicly.
