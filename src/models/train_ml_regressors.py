@@ -21,7 +21,8 @@ def build_models(seed: int) -> dict[str, object]:
             n_estimators=300,
             min_samples_leaf=2,
             random_state=seed,
-            n_jobs=-1,
+            # Serial execution keeps governed evidence byte-deterministic.
+            n_jobs=1,
         ),
         "Gradient Boosting": GradientBoostingRegressor(
             n_estimators=200,
