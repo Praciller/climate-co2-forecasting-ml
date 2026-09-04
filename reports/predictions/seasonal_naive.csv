@@ -1,79 +1,79 @@
-date,actual,prediction
-1995-07-31,361.8,359.46
-1995-08-31,359.375,357.375
-1995-09-30,358.0,355.92499999999995
-1995-10-31,357.85,356.02
-1995-11-30,359.475,357.575
-1995-12-31,360.7,359.06
-1996-01-31,362.025,359.975
-1996-02-29,363.175,360.925
-1996-03-31,364.06000000000006,361.575
-1996-04-30,364.7,363.36
-1996-05-31,365.325,363.7
-1996-06-30,364.88,363.25
-1996-07-31,363.475,361.8
-1996-08-31,361.32,359.375
-1996-09-30,359.4,358.0
-1996-10-31,359.625,357.85
-1996-11-30,360.74,359.475
-1996-12-31,362.375,360.7
-1997-01-31,363.125,362.025
-1997-02-28,363.875,363.175
-1997-03-31,364.56,364.06000000000006
-1997-04-30,366.325,364.7
-1997-05-31,366.68,365.325
-1997-06-30,365.475,364.88
-1997-07-31,364.375,363.475
-1997-08-31,362.46,361.32
-1997-09-30,360.15,359.4
-1997-10-31,360.75,359.625
-1997-11-30,362.38,360.74
-1997-12-31,364.25,362.375
-1998-01-31,365.34,363.125
-1998-02-28,366.2,363.875
-1998-03-31,367.375,364.56
-1998-04-30,368.525,366.325
-1998-05-31,369.14,366.68
-1998-06-30,368.75,365.475
-1998-07-31,367.6,364.375
-1998-08-31,365.72,362.46
-1998-09-30,363.925,360.15
-1998-10-31,364.32,360.75
-1998-11-30,365.55,362.38
-1998-12-31,366.925,364.25
-1999-01-31,368.12,365.34
-1999-02-28,368.85,366.2
-1999-03-31,369.6,367.375
-1999-04-30,370.975,368.525
-1999-05-31,370.84,369.14
-1999-06-30,370.25,368.75
-1999-07-31,369.0,367.6
-1999-08-31,366.7,365.72
-1999-09-30,364.675,363.925
-1999-10-31,365.14,364.32
-1999-11-30,366.65,365.55
-1999-12-31,367.9,366.925
-2000-01-31,369.02,368.12
-2000-02-29,369.375,368.85
-2000-03-31,370.4,369.6
-2000-04-30,371.54,370.975
-2000-05-31,371.65,370.84
-2000-06-30,371.625,370.25
-2000-07-31,369.94,369.0
-2000-08-31,367.95,366.7
-2000-09-30,366.54,364.675
-2000-10-31,366.725,365.14
-2000-11-30,368.125,366.65
-2000-12-31,369.44,367.9
-2001-01-31,370.175,369.02
-2001-02-28,371.325,369.375
-2001-03-31,372.06,370.4
-2001-04-30,372.775,371.54
-2001-05-31,373.8,371.65
-2001-06-30,373.06,371.625
-2001-07-31,371.3,369.94
-2001-08-31,369.425,367.95
-2001-09-30,367.88,366.54
-2001-10-31,368.05,366.725
-2001-11-30,369.375,368.125
-2001-12-31,371.02,369.44
+date,origin_date,horizon,evaluation_split,protocol,refit_at_origin,actual,prediction
+1995-07-31,1995-06-30,1,test,rolling-origin one-step-ahead,False,361.8,359.46
+1995-08-31,1995-07-31,1,test,rolling-origin one-step-ahead,False,359.375,357.375
+1995-09-30,1995-08-31,1,test,rolling-origin one-step-ahead,False,358.0,355.92499999999995
+1995-10-31,1995-09-30,1,test,rolling-origin one-step-ahead,False,357.85,356.02
+1995-11-30,1995-10-31,1,test,rolling-origin one-step-ahead,False,359.475,357.575
+1995-12-31,1995-11-30,1,test,rolling-origin one-step-ahead,False,360.7,359.06
+1996-01-31,1995-12-31,1,test,rolling-origin one-step-ahead,False,362.025,359.975
+1996-02-29,1996-01-31,1,test,rolling-origin one-step-ahead,False,363.175,360.925
+1996-03-31,1996-02-29,1,test,rolling-origin one-step-ahead,False,364.06000000000006,361.575
+1996-04-30,1996-03-31,1,test,rolling-origin one-step-ahead,False,364.7,363.36
+1996-05-31,1996-04-30,1,test,rolling-origin one-step-ahead,False,365.325,363.7
+1996-06-30,1996-05-31,1,test,rolling-origin one-step-ahead,False,364.88,363.25
+1996-07-31,1996-06-30,1,test,rolling-origin one-step-ahead,False,363.475,361.8
+1996-08-31,1996-07-31,1,test,rolling-origin one-step-ahead,False,361.32,359.375
+1996-09-30,1996-08-31,1,test,rolling-origin one-step-ahead,False,359.4,358.0
+1996-10-31,1996-09-30,1,test,rolling-origin one-step-ahead,False,359.625,357.85
+1996-11-30,1996-10-31,1,test,rolling-origin one-step-ahead,False,360.74,359.475
+1996-12-31,1996-11-30,1,test,rolling-origin one-step-ahead,False,362.375,360.7
+1997-01-31,1996-12-31,1,test,rolling-origin one-step-ahead,False,363.125,362.025
+1997-02-28,1997-01-31,1,test,rolling-origin one-step-ahead,False,363.875,363.175
+1997-03-31,1997-02-28,1,test,rolling-origin one-step-ahead,False,364.56,364.06000000000006
+1997-04-30,1997-03-31,1,test,rolling-origin one-step-ahead,False,366.325,364.7
+1997-05-31,1997-04-30,1,test,rolling-origin one-step-ahead,False,366.68,365.325
+1997-06-30,1997-05-31,1,test,rolling-origin one-step-ahead,False,365.475,364.88
+1997-07-31,1997-06-30,1,test,rolling-origin one-step-ahead,False,364.375,363.475
+1997-08-31,1997-07-31,1,test,rolling-origin one-step-ahead,False,362.46,361.32
+1997-09-30,1997-08-31,1,test,rolling-origin one-step-ahead,False,360.15,359.4
+1997-10-31,1997-09-30,1,test,rolling-origin one-step-ahead,False,360.75,359.625
+1997-11-30,1997-10-31,1,test,rolling-origin one-step-ahead,False,362.38,360.74
+1997-12-31,1997-11-30,1,test,rolling-origin one-step-ahead,False,364.25,362.375
+1998-01-31,1997-12-31,1,test,rolling-origin one-step-ahead,False,365.34,363.125
+1998-02-28,1998-01-31,1,test,rolling-origin one-step-ahead,False,366.2,363.875
+1998-03-31,1998-02-28,1,test,rolling-origin one-step-ahead,False,367.375,364.56
+1998-04-30,1998-03-31,1,test,rolling-origin one-step-ahead,False,368.525,366.325
+1998-05-31,1998-04-30,1,test,rolling-origin one-step-ahead,False,369.14,366.68
+1998-06-30,1998-05-31,1,test,rolling-origin one-step-ahead,False,368.75,365.475
+1998-07-31,1998-06-30,1,test,rolling-origin one-step-ahead,False,367.6,364.375
+1998-08-31,1998-07-31,1,test,rolling-origin one-step-ahead,False,365.72,362.46
+1998-09-30,1998-08-31,1,test,rolling-origin one-step-ahead,False,363.925,360.15
+1998-10-31,1998-09-30,1,test,rolling-origin one-step-ahead,False,364.32,360.75
+1998-11-30,1998-10-31,1,test,rolling-origin one-step-ahead,False,365.55,362.38
+1998-12-31,1998-11-30,1,test,rolling-origin one-step-ahead,False,366.925,364.25
+1999-01-31,1998-12-31,1,test,rolling-origin one-step-ahead,False,368.12,365.34
+1999-02-28,1999-01-31,1,test,rolling-origin one-step-ahead,False,368.85,366.2
+1999-03-31,1999-02-28,1,test,rolling-origin one-step-ahead,False,369.6,367.375
+1999-04-30,1999-03-31,1,test,rolling-origin one-step-ahead,False,370.975,368.525
+1999-05-31,1999-04-30,1,test,rolling-origin one-step-ahead,False,370.84,369.14
+1999-06-30,1999-05-31,1,test,rolling-origin one-step-ahead,False,370.25,368.75
+1999-07-31,1999-06-30,1,test,rolling-origin one-step-ahead,False,369.0,367.6
+1999-08-31,1999-07-31,1,test,rolling-origin one-step-ahead,False,366.7,365.72
+1999-09-30,1999-08-31,1,test,rolling-origin one-step-ahead,False,364.675,363.925
+1999-10-31,1999-09-30,1,test,rolling-origin one-step-ahead,False,365.14,364.32
+1999-11-30,1999-10-31,1,test,rolling-origin one-step-ahead,False,366.65,365.55
+1999-12-31,1999-11-30,1,test,rolling-origin one-step-ahead,False,367.9,366.925
+2000-01-31,1999-12-31,1,test,rolling-origin one-step-ahead,False,369.02,368.12
+2000-02-29,2000-01-31,1,test,rolling-origin one-step-ahead,False,369.375,368.85
+2000-03-31,2000-02-29,1,test,rolling-origin one-step-ahead,False,370.4,369.6
+2000-04-30,2000-03-31,1,test,rolling-origin one-step-ahead,False,371.54,370.975
+2000-05-31,2000-04-30,1,test,rolling-origin one-step-ahead,False,371.65,370.84
+2000-06-30,2000-05-31,1,test,rolling-origin one-step-ahead,False,371.625,370.25
+2000-07-31,2000-06-30,1,test,rolling-origin one-step-ahead,False,369.94,369.0
+2000-08-31,2000-07-31,1,test,rolling-origin one-step-ahead,False,367.95,366.7
+2000-09-30,2000-08-31,1,test,rolling-origin one-step-ahead,False,366.54,364.675
+2000-10-31,2000-09-30,1,test,rolling-origin one-step-ahead,False,366.725,365.14
+2000-11-30,2000-10-31,1,test,rolling-origin one-step-ahead,False,368.125,366.65
+2000-12-31,2000-11-30,1,test,rolling-origin one-step-ahead,False,369.44,367.9
+2001-01-31,2000-12-31,1,test,rolling-origin one-step-ahead,False,370.175,369.02
+2001-02-28,2001-01-31,1,test,rolling-origin one-step-ahead,False,371.325,369.375
+2001-03-31,2001-02-28,1,test,rolling-origin one-step-ahead,False,372.06,370.4
+2001-04-30,2001-03-31,1,test,rolling-origin one-step-ahead,False,372.775,371.54
+2001-05-31,2001-04-30,1,test,rolling-origin one-step-ahead,False,373.8,371.65
+2001-06-30,2001-05-31,1,test,rolling-origin one-step-ahead,False,373.06,371.625
+2001-07-31,2001-06-30,1,test,rolling-origin one-step-ahead,False,371.3,369.94
+2001-08-31,2001-07-31,1,test,rolling-origin one-step-ahead,False,369.425,367.95
+2001-09-30,2001-08-31,1,test,rolling-origin one-step-ahead,False,367.88,366.54
+2001-10-31,2001-09-30,1,test,rolling-origin one-step-ahead,False,368.05,366.725
+2001-11-30,2001-10-31,1,test,rolling-origin one-step-ahead,False,369.375,368.125
+2001-12-31,2001-11-30,1,test,rolling-origin one-step-ahead,False,371.02,369.44

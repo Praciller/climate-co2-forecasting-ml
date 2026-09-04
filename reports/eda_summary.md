@@ -16,8 +16,8 @@
 
 ## Stationarity
 
-- Level ADF statistic: 2.232, p-value: 0.9989.
-- First-difference ADF statistic: -4.751, p-value: 0.0001.
+- Level ADF statistic: 2.285, p-value: 0.9989.
+- First-difference ADF statistic: -4.924, p-value: 0.0000.
 - The level series is non-stationary; differencing materially improves stationarity.
 
 ## Forecasting Challenges

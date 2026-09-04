@@ -1,17 +1,9 @@
-date,co2,residual_anomaly,isolation_forest_anomaly,is_anomaly,methods
-1959-03-31,316.7333333333333,False,True,True,Isolation Forest
-1959-10-31,313.4,False,True,True,Isolation Forest
-1959-11-30,314.875,False,True,True,Isolation Forest
-1959-12-31,315.525,False,True,True,Isolation Forest
-1960-01-31,316.38,False,True,True,Isolation Forest
-1998-07-31,367.6,False,True,True,Isolation Forest
-1999-10-31,365.14,False,True,True,Isolation Forest
-2000-07-31,369.94,False,True,True,Isolation Forest
-2000-12-31,369.44,False,True,True,Isolation Forest
-2001-01-31,370.175,False,True,True,Isolation Forest
-2001-07-31,371.3,False,True,True,Isolation Forest
-2001-08-31,369.425,False,True,True,Isolation Forest
-2001-09-30,367.88,False,True,True,Isolation Forest
-2001-10-31,368.05,False,True,True,Isolation Forest
-2001-11-30,369.375,False,True,True,Isolation Forest
-2001-12-31,371.02,False,True,True,Isolation Forest
+date,co2,residual_ppm,residual_anomaly,isolation_score,isolation_forest_anomaly,is_anomaly,methods
+1995-08-31,359.375,-0.2940815826958669,False,0.5743051044448646,True,True,Isolation Forest
+1997-09-30,360.15,-0.5786628136635272,False,0.5673997837087348,True,True,Isolation Forest
+1998-05-31,369.14,0.15994147455359098,False,0.577810310120685,True,True,Isolation Forest
+1998-06-30,368.75,0.3718885982237907,False,0.622511124898171,True,True,Isolation Forest
+1998-07-31,367.6,0.5332513065267221,False,0.6154101488483394,True,True,Isolation Forest
+1998-08-31,365.72,0.4038530698883278,False,0.6144330509787671,True,True,Isolation Forest
+1998-09-30,363.925,0.17102154589321117,False,0.6178517811467081,True,True,Isolation Forest
+1998-10-31,364.32,0.34711144953547546,False,0.5999929184064696,True,True,Isolation Forest
