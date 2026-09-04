@@ -25,3 +25,7 @@ dist-ssr
 
 *storybook.log
 storybook-static
+
+# Playwright test output (committed snapshots live under e2e/snapshots)
+playwright-report
+test-results

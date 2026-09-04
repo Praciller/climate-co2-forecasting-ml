@@ -12,7 +12,12 @@
     "build-storybook": "storybook build",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
-    "test:storybook": "vitest run --config vitest.storybook.config.ts"
+    "test:storybook": "vitest run --config vitest.storybook.config.ts",
+    "test:e2e": "playwright test --config playwright.config.ts",
+    "test:e2e:headed": "playwright test --config playwright.config.ts --headed",
+    "test:e2e:report": "playwright show-report playwright-report",
+    "test:e2e:update-snapshots": "playwright test --config playwright.config.ts --update-snapshots",
+    "test:e2e:verify-baselines": "node e2e/verify-snapshots.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
@@ -24,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "@storybook/addon-a11y": "^10.6.0",
     "@storybook/addon-docs": "^10.6.0",
     "@storybook/addon-vitest": "^10.6.0",
@@ -36,6 +42,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@playwright/test": "1.62.1",
     "@vitest/browser-playwright": "^4.1.11",
     "eslint": "^10.3.0",
     "eslint-plugin-react-hooks": "^7.1.1",

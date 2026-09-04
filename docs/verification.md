@@ -193,3 +193,41 @@ deterministic; only `generated_at` varies between runs. A future drift check may
 normalize only that field. The manifest's `generated_at` and its derived
 `artifacts.live_forecast.sha256` are runtime-only and are not tracked-evidence
 comparison inputs.
+
+## Issue #7 browser verification
+
+From `frontend/`, run:
+
+```text
+npm ci
+npm run test:e2e
+npm run test:e2e:report
+```
+
+Playwright starts the real local environment through `e2e/start-backend.mjs`:
+it runs `python -m src.pipeline`, starts FastAPI, waits on `/ready`, and starts
+Vite at `http://127.0.0.1:4173`. The suite uses only the packaged historical
+dataset and no current or internet data. The desktop project is Chromium at
+1440x900; the mobile project is Chromium at 390x844. Retries are disabled and
+CI uses one worker.
+
+The browser suite covers all five navigation destinations, reviewer-critical
+model/forecast/anomaly semantics, keyboard focus and `aria-current`, mobile
+page-level overflow, and deterministic API-unavailable/retry recovery. The
+positive path is real API-backed application behavior; only the failure path
+uses Playwright request routing to abort one API request.
+
+Four focused visual regions are committed under `frontend/e2e/snapshots/`:
+desktop Overview evidence, desktop Model Evaluation development-vs-final-test
+evidence, desktop Forecast evidence, and the mobile Overview shell. Snapshots
+are canonical Linux/Chromium baselines generated in the same environment as the
+CI `browser-e2e` job. Windows reference images are not committed. Animations are
+disabled, caret rendering is hidden, and `generated_at` is outside every visual
+region. Use `npm run test:e2e:update-snapshots` only in that canonical Linux
+environment after reviewing the resulting diff.
+
+CI uploads `playwright-report/` and `test-results/` on failure. The scoped
+`test:e2e:verify-baselines` step fails if the snapshot directory is missing or
+becomes modified/untracked; it does not apply a blanket repository dirty-tree
+policy. Runtime-only manifests, interval/residual reports, validation
+predictions, and model binaries remain untracked under the Issue #15 policy.
