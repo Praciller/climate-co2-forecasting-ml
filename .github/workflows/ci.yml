@@ -74,15 +74,17 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Run browser E2E and visual regression
-        run: npm run test:e2e -- --update-snapshots
-      - name: Upload Playwright evidence
+        run: npm run test:e2e
+      - name: Verify committed visual baselines
         if: always()
+        run: npm run test:e2e:verify-baselines
+      - name: Upload Playwright evidence
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-evidence-${{ github.run_id }}
           path: |
             frontend/playwright-report/
             frontend/test-results/
-            frontend/e2e/snapshots/
           if-no-files-found: warn
           retention-days: 7
