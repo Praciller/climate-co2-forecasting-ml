@@ -11,7 +11,6 @@ from scripts.verify_generated_evidence import (
     select_policy_paths,
 )
 
-
 POLICY = """\
 `TRACKED_GENERATED_REVIEWER_EVIDENCE`:
 
