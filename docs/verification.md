@@ -200,7 +200,7 @@ The governed tracked-evidence baseline is generated on GitHub Actions, not on
 native Windows. The canonical environment is:
 
 ```text
-CANONICAL_EVIDENCE_PLATFORM=Ubuntu 24.04 (ubuntu-latest), x86_64
+CANONICAL_EVIDENCE_PLATFORM=Ubuntu 24.04 (ubuntu-24.04), x86_64
 CANONICAL_PYTHON=3.11.16 (CPython)
 CANONICAL_CONSTRAINTS=constraints/evidence-linux-py311.txt
 CANONICAL_PIP=26.2.1
