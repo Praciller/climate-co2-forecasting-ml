@@ -7,11 +7,21 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      MPLBACKEND: Agg
+      TZ: UTC
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.11.16"
           cache: pip
       - run: pip install -r requirements.txt
       - run: ruff check src tests
@@ -21,6 +31,24 @@ jobs:
       - run: python -m compileall -q src
       - run: python -m src.verify_repository
       - run: docker compose config --quiet
+      - name: Bootstrap canonical Linux evidence artifact
+        run: |
+          bootstrap_dir=/tmp/canonical-linux-evidence-bootstrap
+          mkdir -p "$bootstrap_dir/evidence/data/processed" "$bootstrap_dir/evidence/reports/figures" "$bootstrap_dir/evidence/reports/predictions"
+          cp data/processed/*.csv "$bootstrap_dir/evidence/data/processed/"
+          cp reports/anomalies.csv reports/anomaly_report.md reports/baseline_metrics.json reports/data_validation_report.md reports/dataset_metadata.md reports/eda_summary.md reports/forecast_interval_evaluation.json reports/forecast_metrics.json reports/live_forecast.json reports/lstm_metrics.json reports/ml_regressor_metrics.json reports/model_comparison.md reports/rolling_origin_evaluation.json reports/rolling_origin_evaluation.md reports/statistical_metrics.json "$bootstrap_dir/evidence/reports/"
+          cp reports/figures/*.png "$bootstrap_dir/evidence/reports/figures/"
+          cp reports/predictions/{exponential_smoothing,gradient_boosting,moving_average,naive,random_forest,sarima,seasonal_naive}.csv "$bootstrap_dir/evidence/reports/predictions/"
+          python -c "import platform, sys; print('runner_os=Ubuntu 24.04 (ubuntu-latest)'); print(f'python={sys.version}'); print(f'implementation={platform.python_implementation()}'); print(f'machine={platform.machine()}'); print(f'platform={platform.platform()}')" > "$bootstrap_dir/environment.txt"
+          python -m pip --version >> "$bootstrap_dir/environment.txt"
+          python -m pip freeze > "$bootstrap_dir/pip-freeze.txt"
+      - name: Upload canonical Linux bootstrap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-linux-evidence-bootstrap
+          path: /tmp/canonical-linux-evidence-bootstrap/
+          if-no-files-found: error
+          retention-days: 7
       - name: Execute EDA notebook
         run: >-
           jupyter nbconvert
