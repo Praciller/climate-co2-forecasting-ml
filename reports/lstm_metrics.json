@@ -1,9 +1,14 @@
 {
-  "PyTorch LSTM": {
-    "mae": 28.00855853740986,
-    "rmse": 28.23466356587282,
-    "mape": 7.636309229546316,
-    "smape": 7.9439446741463495,
-    "mase": 22.793660284309
+  "evidence_type": "pipeline_smoke",
+  "ranking_eligible": false,
+  "epochs_requested": 2,
+  "epochs_completed": 2,
+  "best_validation_loss": 4.204232692718506,
+  "validation_metrics": {
+    "mae": 22.178148970170458,
+    "rmse": 22.372786193555793,
+    "mape": 6.2172302945145494,
+    "smape": 6.419959950415934,
+    "mase": 18.048591105524764
   }
 }
