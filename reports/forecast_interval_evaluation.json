@@ -9,13 +9,13 @@
   "calibration_samples": 77,
   "evaluation_split": "final_test",
   "evaluation_samples": 78,
-  "average_width_ppm": 1.0113001093172898,
-  "radius_ppm": 0.5056500546586449,
+  "average_width_ppm": 1.011299065203616,
+  "radius_ppm": 0.505649532601808,
   "horizon_behavior": {
     "1": {
       "samples": 78,
       "empirical_coverage": 0.9102564102564102,
-      "average_width_ppm": 1.0113001093172898
+      "average_width_ppm": 1.011299065203616
     }
   },
   "limitations": "This is a measured one-step prediction interval from development residuals. Fold residuals are time-dependent and may not be exchangeable; coverage is empirical for this historical final-test period and is not established for multi-step serving horizons."

@@ -12,6 +12,6 @@
 - **Duplicate timestamps:** 0
 - **Upstream retrieval date:** 2014-03-15
 - **Source-data license:** Public domain
-- **CSV SHA-256:** `6d5ee9e8d32c1f8fa5f24f30a33ada05615ab19b3c4f6699fd2efc7d29b73085`
+- **CSV SHA-256:** `2737f74222cf1fb702d41058927d2b8d2a34778d519bfa6b1dea2f1b47c234f4`
 
 This is a historical dataset packaged with statsmodels. It is not a current monitoring feed and this repository performs no network retrieval when loading it.
