@@ -1,0 +1,14 @@
+name: Focused source analysis
+
+paths:
+  - src
+  - scripts
+  - frontend/src
+
+paths-ignore:
+  - frontend/e2e
+  - frontend/node_modules
+  - frontend/dist
+  - data
+  - models
+  - reports
