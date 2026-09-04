@@ -83,8 +83,16 @@ def select_policy_paths(
         for pattern in policy.tracked_patterns
         for expanded_pattern in _expand_braces(pattern)
     )
+    runtime = tuple(
+        expanded_pattern
+        for pattern in policy.runtime_patterns
+        for expanded_pattern in _expand_braces(pattern)
+    )
     return sorted(
-        path for path in tracked_paths if any(_matches(path, pattern) for pattern in expanded)
+        path
+        for path in tracked_paths
+        if any(_matches(path, pattern) for pattern in expanded)
+        and not any(_matches(path, pattern) for pattern in runtime)
     )
 
 

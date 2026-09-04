@@ -5,6 +5,7 @@ import json
 import pytest
 
 from scripts.verify_generated_evidence import (
+    ArtifactPolicy,
     EvidencePolicyError,
     compare_content,
     parse_artifact_policy,
@@ -79,6 +80,16 @@ def test_runtime_only_paths_are_not_selected() -> None:
         "reports/predictions/naive.csv",
         "reports/predictions/sarima.csv",
     ]
+
+
+def test_runtime_policy_wins_if_patterns_overlap() -> None:
+    policy = ArtifactPolicy(
+        tracked_patterns=("reports/predictions/validation/*.csv",),
+        runtime_patterns=("reports/predictions/validation/*.csv",),
+    )
+    assert select_policy_paths(
+        ["reports/predictions/validation/sarima.csv"], policy
+    ) == []
 
 
 def test_volatile_field_is_required_for_live_forecast() -> None:
