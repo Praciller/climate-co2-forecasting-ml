@@ -11,7 +11,7 @@ const destinations = [
 test.beforeEach(async ({ page }) => {
   test.skip(!process.env.PREVIEW_E2E, 'Preview-only shell contract')
   await page.goto('/')
-  await expect(page.getByRole('status')).toContainText('API unavailable')
+  await expect(page.locator('[role="status"][aria-live="polite"]')).toContainText('API unavailable')
 })
 
 test('desktop shell exposes all destinations when API data is unavailable @preview @desktop', async ({ page }) => {
