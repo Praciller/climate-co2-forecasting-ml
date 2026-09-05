@@ -50,7 +50,7 @@ export async function navigateToPage(
 }
 
 export function metricCard(page: Page, label: string) {
-  return page.locator('p').filter({ hasText: label }).first().locator('..')
+  return page.locator('dt').filter({ hasText: label }).first().locator('..')
 }
 
 export async function expectNoPageOverflow(page: Page) {

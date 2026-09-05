@@ -33,17 +33,19 @@ function renderTheme() {
   )
 }
 
-function setMatchMedia(matches: boolean) {
+function setMatchMedia(matches: boolean, mode: 'modern' | 'legacy' = 'modern') {
   let listener: ((event: MediaQueryListEvent) => void) | undefined
   const mediaQuery = {
     matches,
     media: '(prefers-color-scheme: dark)',
     onchange: null,
-    addEventListener: vi.fn((_type: string, nextListener: (event: MediaQueryListEvent) => void) => {
+    addEventListener: mode === 'modern' ? vi.fn((_type: string, nextListener: (event: MediaQueryListEvent) => void) => {
+      listener = nextListener
+    }) : undefined,
+    removeEventListener: vi.fn(),
+    addListener: vi.fn((nextListener: (event: MediaQueryListEvent) => void) => {
       listener = nextListener
     }),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(),
     removeListener: vi.fn(),
     dispatchEvent: vi.fn(),
   } as unknown as MediaQueryList
@@ -127,5 +129,27 @@ describe('ThemeProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('theme-state')).toHaveTextContent('light:light')
     })
+  })
+
+  it('uses the modern media-query listener API once and cleans it up', () => {
+    const media = setMatchMedia(false, 'modern')
+    const view = renderTheme()
+
+    expect(media.mediaQuery.addEventListener).toHaveBeenCalledTimes(1)
+    expect(media.mediaQuery.addListener).not.toHaveBeenCalled()
+    view.unmount()
+    expect(media.mediaQuery.removeEventListener).toHaveBeenCalledTimes(1)
+    expect(media.mediaQuery.removeListener).not.toHaveBeenCalled()
+  })
+
+  it('falls back to the legacy media-query listener API and cleans it up', () => {
+    const media = setMatchMedia(false, 'legacy')
+    const view = renderTheme()
+
+    expect(media.mediaQuery.addEventListener).toBeUndefined()
+    expect(media.mediaQuery.addListener).toHaveBeenCalledTimes(1)
+    view.unmount()
+    expect(media.mediaQuery.removeListener).toHaveBeenCalledTimes(1)
+    expect(media.mediaQuery.removeEventListener).not.toHaveBeenCalled()
   })
 })

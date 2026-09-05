@@ -73,13 +73,14 @@ export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProvid
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = () => updateResolvedTheme()
-    mediaQuery.addEventListener?.('change', handleChange)
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handleChange)
+      return () => mediaQuery.removeEventListener('change', handleChange)
+    }
+
     mediaQuery.addListener?.(handleChange)
 
-    return () => {
-      mediaQuery.removeEventListener?.('change', handleChange)
-      mediaQuery.removeListener?.(handleChange)
-    }
+    return () => mediaQuery.removeListener?.(handleChange)
   }, [theme])
 
   const setTheme = useCallback((nextTheme: Theme) => {
