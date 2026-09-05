@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         mode:
-          - openblas
+          - openblas_numpy
         replica:
           - 1
           - 2
