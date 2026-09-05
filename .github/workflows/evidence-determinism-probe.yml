@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         mode:
-          - openblas_numpy_torch
+          - numpy_only
         replica:
           - 1
           - 2
@@ -54,6 +54,9 @@ jobs:
               ;;
             openblas)
               echo "OPENBLAS_CORETYPE=Haswell" >> "$GITHUB_ENV"
+              ;;
+            numpy_only)
+              echo "NPY_DISABLE_CPU_FEATURES=X86_V3,X86_V4" >> "$GITHUB_ENV"
               ;;
             openblas_numpy)
               echo "OPENBLAS_CORETYPE=Haswell" >> "$GITHUB_ENV"
@@ -164,7 +167,7 @@ jobs:
               ]
               if not openblas or not any(item.get("architecture") == "Haswell" for item in openblas):
                   raise SystemExit("OpenBLAS did not validate the Haswell dispatch target")
-          if mode in {"openblas_numpy", "openblas_numpy_torch"}:
+          if mode in {"numpy_only", "openblas_numpy", "openblas_numpy_torch"}:
               if os.environ.get("NPY_DISABLE_CPU_FEATURES") != "X86_V3,X86_V4":
                   raise SystemExit("NumPy restriction was not applied")
           if mode == "openblas_numpy_torch":
