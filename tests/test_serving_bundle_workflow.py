@@ -23,11 +23,12 @@ def test_serving_bundle_workflow_is_manual_read_only_and_main_only() -> None:
         "python -m src.pipeline",
         "python scripts/verify_generated_evidence.py",
         "python -m src.verify_repository",
-        "python scripts/package_serving_bundle.py",
+        "python -m scripts.package_serving_bundle",
         "ForecastService",
         "actions/upload-artifact@v4",
     ):
         assert command in source
+    assert "python scripts/package_serving_bundle.py" not in source
     assert "contents: write" not in source
     assert "vercel" not in source.lower()
     assert "release" not in source.lower()
