@@ -128,7 +128,7 @@ jobs:
                 "OPENBLAS_VERBOSE",
             ):
                 print(f"{name}={os.environ.get(name, '<unset>')}")
-            PY
+          PY
             echo "--- OpenBLAS probe-only dispatch ---"
             python -c "import numpy as np; np.dot(np.ones((2, 2)), np.ones((2, 2)))"
             echo "--- pip freeze ---"
