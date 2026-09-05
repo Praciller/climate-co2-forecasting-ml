@@ -1,5 +1,10 @@
 .env
 .venv/
+_uv/
+build/
+*.egg-info/
+.python-version
+uv.lock
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -17,6 +22,7 @@ reports/predictions/validation/
 node_modules/
 frontend/node_modules/
 frontend/dist/
+api/frontend_dist/
 .vite/
 .vercel/
 output/playwright/

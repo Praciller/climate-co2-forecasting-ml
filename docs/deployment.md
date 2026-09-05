@@ -25,20 +25,24 @@ The target topology is one public origin:
 
 ```text
 Vercel project root
-  frontend/dist/       React/Vite static output
+  api/frontend_dist/   staged React/Vite static output (generated, ignored)
   /api/*               api/index.py -> existing FastAPI app
 ```
 
 The Vercel configuration builds the frontend with
-`npm --prefix frontend run build` and publishes `frontend/dist`. The application
-currently navigates between pages internally, so no catch-all SPA rewrite is
-needed. If URL-based deep links are introduced later, any rewrite must exclude
-`/api/*`.
+`npm --prefix frontend run build`, then stages only its `index.html` and built
+assets into `api/frontend_dist/`. The source tree, `node_modules`, and original
+`frontend/dist/` remain excluded from the Python function upload. `api/index.py`
+serves that generated directory with FastAPI's `app.frontend()` helper after the
+`/api` mount; normal API routes therefore retain priority, and the explicit
+`index.html` fallback supports client-side dashboard paths. If URL-based deep
+links are introduced later, any rewrite must exclude `/api/*`.
 
 ## API routing and CORS
 
-`api/index.py` mounts the existing `src.api.main:app` under `/api`, without
-copying endpoint implementations. The production contract is:
+`api/index.py` serves the generated dashboard at `/` and mounts the existing
+`src.api.main:app` under `/api`, without copying endpoint implementations. The
+production API contract is:
 
 - `/api/health`
 - `/api/ready`
@@ -52,6 +56,13 @@ Uvicorn, and existing tests. Local split frontend/API development retains
 localhost and `127.0.0.1` CORS. The production frontend calls `/api` on the same
 origin, so production does not need a CORS allowlist, credentials, or wildcard
 `Access-Control-Allow-Origin`.
+
+The staging command is portable Python and validates that the build output has
+`index.html`, contains no symlinks, and contains none of the source, test,
+training, data, or dependency directories that must remain outside the
+function. Frontend-public assets such as the dashboard's evidence images remain
+valid build output. It replaces only the generated `api/frontend_dist/`
+directory and does not modify tracked repository files.
 
 ## Serving dependency isolation
 
