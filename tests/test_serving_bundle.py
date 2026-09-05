@@ -10,7 +10,6 @@ import pytest
 from scripts.package_serving_bundle import BundlePackagingError, package_bundle
 from src.artifacts import ArtifactValidationError, sha256_file, write_manifest
 
-
 ARTIFACTS = {
     "raw_data": "data/raw/co2_raw.csv",
     "monthly_data": "data/processed/co2_monthly.csv",

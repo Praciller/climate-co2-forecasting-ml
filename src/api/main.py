@@ -10,13 +10,13 @@ from fastapi import FastAPI, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from scripts.install_serving_bundle import BundleInstallError, resolve_serving_root
 from src.api.diagnostics import emit_event
 from src.api.schemas import (
     AnomalyPoint,
     ForecastResponse,
     HistoricalPoint,
 )
-from scripts.install_serving_bundle import BundleInstallError, resolve_serving_root
 from src.api.service import ForecastService, ServiceNotReadyError
 from src.utils.config import MAX_FORECAST_HORIZON, PROJECT_ROOT
 

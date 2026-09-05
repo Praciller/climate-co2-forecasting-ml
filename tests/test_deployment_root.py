@@ -4,6 +4,7 @@ import hashlib
 import io
 import tarfile
 from pathlib import Path
+from typing import Self
 
 import pytest
 
@@ -18,7 +19,7 @@ from src.utils.config import PROJECT_ROOT
 
 
 class _Response(io.BytesIO):
-    def __enter__(self) -> _Response:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *_args: object) -> None:

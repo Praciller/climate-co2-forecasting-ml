@@ -7,12 +7,11 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+import src.api.main as api_main
 from api.index import app
 from scripts.install_serving_bundle import extract_and_validate_bundle
 from scripts.package_serving_bundle import package_bundle
-import src.api.main as api_main
 from src.api.service import ForecastService
-
 
 RUNTIME_PATHS = (
     "data/raw/co2_raw.csv",
