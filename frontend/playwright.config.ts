@@ -7,6 +7,7 @@ const frontendRoot = path.dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = path.resolve(frontendRoot, '..')
 const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL
 const liveMode = Boolean(externalBaseURL)
+const vercelAutomationBypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
 
 export default defineConfig({
   testDir: './e2e',
@@ -29,6 +30,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
+    extraHTTPHeaders: vercelAutomationBypassSecret
+      ? {
+          'x-vercel-protection-bypass': vercelAutomationBypassSecret,
+          'x-vercel-set-bypass-cookie': 'true',
+        }
+      : undefined,
   },
   testIgnore: liveMode ? ['**/visual.spec.ts'] : undefined,
   projects: [
