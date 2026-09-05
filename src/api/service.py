@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 
 import pandas as pd
 
+from src.api.diagnostics import emit_event
 from src.api.schemas import ForecastPoint, ForecastResponse
 from src.artifacts import ArtifactValidationError, validate_manifest
 from src.utils.config import MAX_FORECAST_HORIZON, PROJECT_ROOT
@@ -29,6 +30,7 @@ class ForecastService:
         self.root = root.resolve()
         self.ready = False
         self.readiness_code = "artifact_validation_failed"
+        self.readiness_failure_category: str | None = None
         self.manifest: dict[str, Any] = {}
         self.paths: dict[str, Path] = {}
         self.history = pd.DataFrame()
@@ -36,10 +38,28 @@ class ForecastService:
         self.forecast_artifact: dict[str, Any] = {}
         try:
             self._load_governed_artifacts()
-        except (ArtifactValidationError, ValueError, KeyError, OSError):
+        except ArtifactValidationError as exc:
+            self._record_load_failure("artifact_validation_error", exc)
+            return
+        except (ValueError, KeyError) as exc:
+            self._record_load_failure("artifact_content_invalid", exc)
+            return
+        except OSError as exc:
+            self._record_load_failure("artifact_io_error", exc)
             return
         self.ready = True
         self.readiness_code = "ready"
+
+    def _record_load_failure(self, category: str, exc: Exception) -> None:
+        self.readiness_failure_category = category
+        emit_event(
+            "governed_artifact_load_failed",
+            level="ERROR",
+            component="artifact_loader",
+            failure_category=category,
+            error_type=type(exc).__name__,
+            readiness_code=self.readiness_code,
+        )
 
     def _load_governed_artifacts(self) -> None:
         manifest_path = self.root / "reports" / "model_manifest.json"

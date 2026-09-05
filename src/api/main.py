@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from time import perf_counter
 from typing import Annotated
+from uuid import uuid4
 
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from src.api.diagnostics import emit_event
 from src.api.schemas import (
     AnomalyPoint,
     ForecastResponse,
@@ -19,9 +22,22 @@ from src.utils.config import MAX_FORECAST_HORIZON
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    app.state.forecast_service = ForecastService()
-    yield
-    del app.state.forecast_service
+    service = ForecastService()
+    app.state.forecast_service = service
+    emit_event(
+        "api_startup",
+        component="lifecycle",
+        ready=getattr(service, "ready", True),
+        readiness_code=getattr(service, "readiness_code", "not_applicable"),
+        failure_category=getattr(service, "readiness_failure_category", None),
+        history_rows=len(getattr(service, "history", [])),
+        model_loaded=bool(getattr(service, "forecast_artifact", {})),
+    )
+    try:
+        yield
+    finally:
+        emit_event("api_shutdown", component="lifecycle")
+        del app.state.forecast_service
 
 
 app = FastAPI(
@@ -38,15 +54,66 @@ app.add_middleware(
 )
 
 
+def _route_template(request: Request) -> str:
+    route = request.scope.get("route")
+    path = getattr(route, "path", None)
+    return str(path) if path else "<unmatched>"
+
+
+@app.middleware("http")
+async def request_diagnostics(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
+) -> Response:
+    request_id = uuid4().hex
+    request.state.request_id = request_id
+    started = perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        emit_event(
+            "api_request_failed",
+            level="ERROR",
+            component="request",
+            request_id=request_id,
+            method=request.method,
+            route=_route_template(request),
+            error_type=type(exc).__name__,
+            duration_ms=round((perf_counter() - started) * 1000, 3),
+        )
+        raise
+    response.headers["X-Request-ID"] = request_id
+    emit_event(
+        "api_request_completed",
+        component="request",
+        request_id=request_id,
+        method=request.method,
+        route=_route_template(request),
+        status_code=response.status_code,
+        duration_ms=round((perf_counter() - started) * 1000, 3),
+    )
+    return response
+
+
 def get_service(request: Request) -> ForecastService:
     return request.app.state.forecast_service
 
 
 @app.exception_handler(ServiceNotReadyError)
 def service_not_ready(
-    _request: Request,
+    request: Request,
     _exc: ServiceNotReadyError,
 ) -> JSONResponse:
+    service = get_service(request)
+    emit_event(
+        "api_service_not_ready",
+        level="WARNING",
+        component="readiness",
+        request_id=getattr(request.state, "request_id", None),
+        route=_route_template(request),
+        readiness_code=getattr(service, "readiness_code", "artifact_validation_failed"),
+        failure_category=getattr(service, "readiness_failure_category", None),
+    )
     return JSONResponse(
         status_code=503,
         content={
@@ -72,6 +139,16 @@ def health(request: Request) -> dict[str, object]:
 def readiness(request: Request) -> JSONResponse:
     service = get_service(request)
     status_code = 200 if service.ready else 503
+    if not service.ready:
+        emit_event(
+            "api_readiness_failed",
+            level="WARNING",
+            component="readiness",
+            request_id=getattr(request.state, "request_id", None),
+            route=_route_template(request),
+            readiness_code=service.readiness_code,
+            failure_category=service.readiness_failure_category,
+        )
     return JSONResponse(
         status_code=status_code,
         content={"ready": service.ready, "code": service.readiness_code},
