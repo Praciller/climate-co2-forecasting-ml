@@ -108,7 +108,7 @@ npm run test:storybook
 npm audit --audit-level=high
 ```
 
-The CI frontend job runs the same checks. The unit suite covers MetricCard,
+The CI frontend job runs the same checks. The unit suite covers MetricDefinition,
 LoadingState, ErrorMessage, ModelComparisonTable, and AppShell. Storybook
 stories cover those components and enforce configured accessibility checks.
 

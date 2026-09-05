@@ -53,7 +53,7 @@ npm audit --audit-level=high
 ## Quality foundation
 
 The unit suite uses Vitest, jsdom, and Testing Library with `jest-dom` matchers.
-Representative coverage includes MetricCard, LoadingState, ErrorMessage,
+Representative coverage includes MetricDefinition, LoadingState, ErrorMessage,
 ModelComparisonTable, and AppShell. Storybook stories cover the same shared
 surface and run through Storybook's official Vitest browser integration with
 the a11y addon configured to fail on violations.
