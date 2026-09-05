@@ -4,7 +4,7 @@ import json
 import logging
 import re
 from collections.abc import Mapping, Sequence
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 LOGGER_NAME = "co2_forecast_api"
@@ -85,7 +85,7 @@ def build_event(
     **context: Any,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "level": level.upper(),
         "service": SERVICE_NAME,
         "component": component,

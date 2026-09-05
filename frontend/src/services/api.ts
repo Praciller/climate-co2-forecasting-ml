@@ -5,8 +5,9 @@ import type {
   HistoricalPoint,
   ModelInfo,
 } from '../types/api'
+import { resolveApiBase } from './api-config'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const API_URL = resolveApiBase(import.meta.env)
 
 async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, { signal })
