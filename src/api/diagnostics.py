@@ -95,7 +95,7 @@ def build_event(
         {
             key: _sanitize_value(value, key=key)
             for key, value in context.items()
-            if value is not None
+            if value is not None and key not in payload
         }
     )
     return payload
