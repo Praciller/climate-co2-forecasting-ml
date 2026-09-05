@@ -39,6 +39,11 @@ jobs:
         run: python -m src.pipeline
       - name: Verify governed evidence drift
         run: python scripts/verify_generated_evidence.py
+      - name: Smoke package serving bundle CLI
+        run: >-
+          python -m scripts.package_serving_bundle
+          --root "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/ci-serving-bundle.tar.gz"
       - run: python -m pytest
       - run: python -m compileall -q src
       - run: python -m src.verify_repository

@@ -58,7 +58,7 @@ jobs:
 
       - name: Package serving bundle
         run: >-
-          python scripts/package_serving_bundle.py
+          python -m scripts.package_serving_bundle
           --root "$GITHUB_WORKSPACE"
           --output "$RUNNER_TEMP/co2-serving-bundle.tar.gz"
           --sha-file "$RUNNER_TEMP/co2-serving-bundle.tar.gz.sha256"
