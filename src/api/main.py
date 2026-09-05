@@ -16,13 +16,14 @@ from src.api.schemas import (
     ForecastResponse,
     HistoricalPoint,
 )
+from scripts.install_serving_bundle import BundleInstallError, resolve_serving_root
 from src.api.service import ForecastService, ServiceNotReadyError
-from src.utils.config import MAX_FORECAST_HORIZON
+from src.utils.config import MAX_FORECAST_HORIZON, PROJECT_ROOT
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    service = ForecastService()
+    service = create_forecast_service()
     app.state.forecast_service = service
     emit_event(
         "api_startup",
@@ -38,6 +39,26 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     finally:
         emit_event("api_shutdown", component="lifecycle")
         del app.state.forecast_service
+
+
+def create_forecast_service() -> ForecastService:
+    """Create a service from the local root or an explicitly pinned bundle."""
+
+    try:
+        root = resolve_serving_root()
+    except BundleInstallError as exc:
+        emit_event(
+            "serving_bundle_install_failed",
+            level="ERROR",
+            component="artifact_loader",
+            failure_category="serving_bundle_install_error",
+            error_type=type(exc).__name__,
+            readiness_code="artifact_validation_failed",
+        )
+        root = PROJECT_ROOT / "__unavailable_serving_bundle__"
+    if root == PROJECT_ROOT:
+        return ForecastService()
+    return ForecastService(root=root)
 
 
 app = FastAPI(

@@ -1,0 +1,13 @@
+requirements.txt
+requirements-api.txt
+constraints/
+data/
+reports/
+models/
+notebooks/
+tests/
+frontend/node_modules/
+frontend/dist/
+frontend/storybook-static/
+frontend/playwright-report/
+frontend/test-results/
