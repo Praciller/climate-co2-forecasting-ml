@@ -237,10 +237,10 @@ Run `git push -u origin feat/portfolio-deployment` and compare `git rev-parse HE
 
 Include `Closes #26`, parent #24, the hosting decision, dependency isolation proof, API prefix, same-origin CORS, bundle/workflow integrity, tests, limitations, and explicit `PUBLIC_DEPLOYMENT_CREATED=NO`.
 
-- [ ] **Step 3: Wait for fresh PR CI and CodeQL.**
+- [x] **Step 3: Wait for fresh PR CI and CodeQL.**
 
 Require backend, frontend, browser-e2e, and CodeQL to finish green on the new head. Fix failures on this branch only; do not weaken tests or create a second PR.
 
-- [ ] **Step 4: Stop at owner handoff.**
+- [x] **Step 4: Stop at owner handoff.**
 
 Leave the PR open, unmerged, and clean. Report `LOCAL_BUNDLE_TEST` separately from `CANONICAL_MAIN_BUNDLE`, which is not created in this PR stage; recommend merge, protected-main bundle generation, pinned release asset, Vercel project creation/configuration, production deployment, public API/browser verification, and only then README/About updates.
