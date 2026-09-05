@@ -54,11 +54,12 @@ def test_missing_manifest_emits_sanitized_failure_category(
 
 def test_request_completion_log_has_request_id_and_route_without_query(monkeypatch) -> None:
     class HealthyService:
-        ready = True
-        readiness_code = "ready"
-        readiness_failure_category = None
-        forecast_artifact = {"model_name": "SARIMA"}
-        history: list[object] = []
+        def __init__(self) -> None:
+            self.ready = True
+            self.readiness_code = "ready"
+            self.readiness_failure_category = None
+            self.forecast_artifact = {"model_name": "SARIMA"}
+            self.history: list[object] = []
 
     events: list[tuple[str, dict[str, object]]] = []
 
@@ -85,11 +86,12 @@ def test_request_completion_log_has_request_id_and_route_without_query(monkeypat
 
 def test_failed_readiness_check_logs_category_without_changing_contract(monkeypatch) -> None:
     class UnreadyService:
-        ready = False
-        readiness_code = "artifact_validation_failed"
-        readiness_failure_category = "artifact_validation_error"
-        forecast_artifact: dict[str, object] = {}
-        history: list[object] = []
+        def __init__(self) -> None:
+            self.ready = False
+            self.readiness_code = "artifact_validation_failed"
+            self.readiness_failure_category = "artifact_validation_error"
+            self.forecast_artifact: dict[str, object] = {}
+            self.history: list[object] = []
 
     events: list[tuple[str, dict[str, object]]] = []
 
