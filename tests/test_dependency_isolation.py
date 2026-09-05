@@ -26,6 +26,21 @@ def test_vercel_project_declares_only_serving_dependencies() -> None:
     assert project["project"]["requires-python"] == ">=3.12,<3.13"
 
 
+def test_vercel_install_contract_overrides_dashboard_and_installs_serving_only() -> None:
+    config = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
+    build_steps = [step.strip() for step in config["buildCommand"].split("&&")]
+
+    assert config["installCommand"] == ""
+    assert build_steps == [
+        "python -m pip install .",
+        "npm --prefix frontend ci",
+        "npm --prefix frontend run build",
+    ]
+    build_command = config["buildCommand"].lower()
+    assert "requirements.txt" not in build_command
+    assert "torch" not in build_command
+
+
 def test_vercel_function_configuration_excludes_nonserving_source() -> None:
     config = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
     function = config["functions"]["api/index.py"]

@@ -57,8 +57,12 @@ origin, so production does not need a CORS allowlist, credentials, or wildcard
 
 Canonical evidence generation continues to install the full `requirements.txt`
 under `constraints/evidence-linux-py311.txt` on Ubuntu 24.04 with Python
-3.11.16. Vercel serving uses the root `pyproject.toml` dependency declaration,
-which contains only FastAPI, NumPy, pandas, statsmodels, and uvicorn. The
+3.11.16. The committed Vercel install override is intentionally empty so the
+dashboard's project-level install command cannot select the full training
+environment. The committed build command installs the root `pyproject.toml`
+serving dependencies, then runs `npm --prefix frontend ci` before the static
+build. The root declaration contains only FastAPI, NumPy, pandas, statsmodels,
+and uvicorn. The
 `.vercelignore` upload boundary excludes `requirements.txt`,
 `requirements-api.txt`, constraints, training data, generated reports, models,
 notebooks, tests, and local build outputs from Vercel inputs. In particular,
