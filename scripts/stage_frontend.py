@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "frontend" / "dist"
 DEFAULT_TARGET = ROOT / "api" / "frontend_dist"
 FORBIDDEN_PARTS = frozenset(
-    {"node_modules", "src", "tests", "data", "models", "notebooks"}
+    {"node_modules", "src", "tests", "data", "reports", "models", "notebooks"}
 )
 
 
