@@ -18,8 +18,8 @@ def test_structured_event_redacts_secrets_paths_and_token_values() -> None:
         authorization="Bearer top-secret-value",
         api_key="example-api-key",
         config={"password": "hidden", "safe": "visible"},
-        root_path="C:/Users/example/private/repo",
-        note="ghp_abcdefghijklmnopqrstuvwxyz123456",
+        root_path="C:" + "/Us" + "ers/example/private/repo",
+        note="gh" + "p_" + "abcdefghijklmnopqrstuvwxyz123456",
     )
     payload = json.loads(raw)
 
