@@ -2,6 +2,9 @@ name: Capture temporary design system v2 baselines
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feat/design-system-v2
 
 permissions:
   contents: read
