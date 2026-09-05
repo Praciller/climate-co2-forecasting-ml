@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11.16 for canonical evidence generation, Vercel Python 3.12 serving runtime, FastAPI, pandas, NumPy, statsmodels, uvicorn, React/Vite, Playwright, pytest, and Python standard-library tar/SHA/archive handling.
 
-**Spec:** `C:/Users/pakon/.codex/attachments/12e5ee3d-8d3d-47c7-a14c-207f434c9583/pasted-text.txt`
+**Spec:** latest deployment-preparation brief supplied with this task
 
 ## Global Constraints
 
