@@ -10,6 +10,10 @@ mlruns/
 artifacts/runs/
 models/*.pt
 models/*.joblib
+reports/model_manifest.json
+reports/interval_report.json
+reports/residual_report.json
+reports/predictions/validation/
 node_modules/
 frontend/node_modules/
 frontend/dist/

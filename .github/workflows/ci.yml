@@ -4,9 +4,13 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   backend:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       PYTHONHASHSEED: "0"
       OMP_NUM_THREADS: "1"
@@ -30,6 +34,8 @@ jobs:
       - run: ruff check src tests
       - name: Regenerate governed evidence
         run: python -m src.pipeline
+      - name: Verify governed evidence drift
+        run: python scripts/verify_generated_evidence.py
       - run: python -m pytest
       - run: python -m compileall -q src
       - run: python -m src.verify_repository
@@ -46,6 +52,7 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: frontend
