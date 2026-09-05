@@ -8,8 +8,23 @@ const destinations = [
   'Model Evaluation',
 ]
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ baseURL, context, page }) => {
   test.skip(!process.env.PREVIEW_E2E, 'Preview-only shell contract')
+
+  const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+  if (bypassSecret) {
+    if (!baseURL) {
+      throw new Error('PLAYWRIGHT_BASE_URL is required for protected Preview checks')
+    }
+    const response = await context.request.get(new URL('/', baseURL).toString(), {
+      headers: {
+        'x-vercel-protection-bypass': bypassSecret,
+        'x-vercel-set-bypass-cookie': 'true',
+      },
+    })
+    expect(response.ok()).toBeTruthy()
+  }
+
   await page.goto('/')
   await expect(page.locator('[role="status"][aria-live="polite"]')).toContainText('API unavailable')
 })
