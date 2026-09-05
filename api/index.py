@@ -1,9 +1,10 @@
-"""Vercel entrypoint mounting the existing FastAPI app under /api."""
+"""Vercel entrypoint serving the dashboard and existing FastAPI app."""
 
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -16,5 +17,19 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         yield
 
 
-app = FastAPI(title="CO2 Forecast Lab Vercel API", lifespan=lifespan)
-app.mount("/api", core_app)
+FRONTEND_DIRECTORY = Path(__file__).resolve().parent / "frontend_dist"
+
+
+def create_app(frontend_directory: Path = FRONTEND_DIRECTORY) -> FastAPI:
+    app = FastAPI(title="CO2 Forecast Lab Vercel API", lifespan=lifespan)
+    app.mount("/api", core_app)
+    app.frontend(
+        "/",
+        directory=str(frontend_directory),
+        fallback="index.html",
+        check_dir=False,
+    )
+    return app
+
+
+app = create_app()

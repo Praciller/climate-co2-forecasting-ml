@@ -35,6 +35,7 @@ def test_vercel_install_contract_overrides_dashboard_and_installs_serving_only()
         "python -m pip install .",
         "npm --prefix frontend ci",
         "npm --prefix frontend run build",
+        "python scripts/stage_frontend.py",
     ]
     build_command = config["buildCommand"].lower()
     assert "requirements.txt" not in build_command
@@ -47,6 +48,8 @@ def test_vercel_function_configuration_excludes_nonserving_source() -> None:
     excludes = function["excludeFiles"]
     for pattern in ("data/**", "reports/**", "models/**", "tests/**", "notebooks/**"):
         assert pattern in excludes
+    assert "frontend/**" in excludes
+    assert "api/frontend_dist/**" not in excludes
     assert "torch" not in (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
@@ -55,3 +58,8 @@ def test_vercel_upload_does_not_include_canonical_training_requirement_files() -
     assert "requirements.txt" in ignored
     assert "requirements-api.txt" in ignored
     assert "constraints/" in ignored
+
+
+def test_staged_frontend_output_is_ignored_but_not_function_excluded() -> None:
+    ignored = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert "api/frontend_dist/" in ignored
