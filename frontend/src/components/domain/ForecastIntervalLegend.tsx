@@ -12,7 +12,7 @@ export function ForecastIntervalLegend({ coverageScope, nominalCoverage }: Forec
         <LegendItem symbolClass="bg-chart-interval/40" label={`${nominalCoverage * 100}% prediction interval`} detail="Soft uncertainty band" />
         <LegendItem symbolClass="border-l-2 border-dashed border-foreground" label="Forecast origin" detail="Projection begins here" />
       </ul>
-      <p className="mt-4 text-xs leading-5 text-muted-foreground">Coverage is evaluated for the documented {coverageScope}; the interval is not calibrated as a general multi-horizon guarantee.</p>
+      <p className="mt-4 text-xs leading-5 text-muted-foreground">Coverage is evaluated for the documented {coverageScope}; there is no separately established multi-horizon coverage, and the interval is not calibrated as a general multi-horizon guarantee.</p>
     </section>
   )
 }

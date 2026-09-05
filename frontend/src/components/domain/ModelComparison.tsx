@@ -25,10 +25,9 @@ export function ModelComparison({ finalTest, selectedModel }: ModelComparisonPro
         <TableBody>
           {rows.map(([name, metrics]) => (
             <TableRow key={name} className={name === selectedModel ? 'bg-primary-muted/45' : undefined}>
-              <TableCell className="font-medium">{name}</TableCell>
+              <TableCell className="font-medium" aria-label={name === selectedModel ? 'Selected by development' : undefined}>{name}</TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1.5">
-                  {name === selectedModel ? <Badge variant="outline" className="border-primary text-primary">Selected by development</Badge> : null}
                   {name === lowestFinalTestModel ? <Badge variant="secondary">Lowest final-test MAE</Badge> : null}
                 </div>
               </TableCell>

@@ -9,7 +9,7 @@ import { anomalyFixture, forecastFixture, historicalFixture, modelInfoFixture } 
 describe('evidence domain modules', () => {
   it('separates development selection from final-test ranking', () => {
     render(<><ModelSelectionSummary selection={modelInfoFixture.selection} developmentMae={0.221} foldCount={5} /><ModelComparison selectedModel="SARIMA" finalTest={modelInfoFixture.metrics.final_test} /></>)
-    expect(screen.getAllByText('Selected by development')).toHaveLength(2)
+    expect(screen.getByText('Selected by development')).toBeInTheDocument()
     expect(screen.getByText('Lowest final-test MAE')).toBeInTheDocument()
     expect(screen.queryByText('Best model')).not.toBeInTheDocument()
     expect(screen.getByText(/Final-test metrics are post-selection evaluation/)).toBeInTheDocument()

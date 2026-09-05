@@ -1,4 +1,6 @@
 import { CircleAlert } from 'lucide-react'
+import { Alert, AlertDescription } from './ui/alert'
+import { Button } from './ui/button'
 
 interface ErrorMessageProps {
   message: string
@@ -7,24 +9,21 @@ interface ErrorMessageProps {
 
 export function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
   return (
-    <section
-      className="mx-auto mt-16 max-w-xl rounded-xl border border-rule bg-surface p-8 text-center"
-      role="alert"
+    <Alert
+      className="mx-auto mt-16 max-w-xl border-destructive/40 bg-destructive/5 p-8 text-center"
     >
       <CircleAlert className="mx-auto text-danger" size={30} aria-hidden="true" />
-      <h2 className="mt-4 text-xl font-semibold">Forecasting API unavailable</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-muted">
-        {message} Start FastAPI on port 8000, then retry.
-      </p>
+      <h2 className="mt-4 text-xl font-medium">Forecasting API unavailable</h2>
+      <AlertDescription className="mx-auto mt-2 max-w-md leading-6">{message} Start FastAPI on port 8000, then retry.</AlertDescription>
       {onRetry ? (
-        <button
+        <Button
           type="button"
           onClick={onRetry}
-          className="mt-5 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="mt-5"
         >
           Retry connection
-        </button>
+        </Button>
       ) : null}
-    </section>
+    </Alert>
   )
 }
