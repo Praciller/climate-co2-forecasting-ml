@@ -14,14 +14,27 @@ This starts:
 The API image uses `requirements-api.txt`, so local serving does not install
 notebook or training dependencies.
 
-## Deployment preparation status
+## Verified portfolio deployment
 
-Deployment preparation is implemented for a single Vercel Hobby project, but no
-public production URL is claimed by this repository. Production project
-creation, bundle publication, deployment, and public verification remain
-owner-gated post-merge actions.
+The public portfolio demo is verified at
+[https://climate-co2-forecasting-ml.vercel.app](https://climate-co2-forecasting-ml.vercel.app).
+Final production verification on 2026-09-05 used protected `main` SHA
+`7d791b44c65e36de36ef00c481473389cb216036` and Vercel deployment
+`dpl_GW4WK9HPf5vxHrzuYv55Fo4v66RW`, which reached `READY` on Python 3.12.
 
-The target topology is one public origin:
+Verification confirmed the dashboard root and all six `/api/*` contracts return
+HTTP 200 with `ready=true`, 526 historical rows, a 24-month SARIMA forecast, and
+8 Isolation Forest / 0 residual anomaly signals. Live Playwright verification
+passed all 14 production dashboard checks across desktop and 390px mobile; the
+two Preview-only checks were intentionally skipped. Production runtime-log
+inspection found no 5xx responses and no error/fatal entries during the final
+verification window.
+
+This remains a portfolio deployment of the pinned historical governed bundle.
+It is not a current atmospheric feed, hosted retraining system, monitoring SLA,
+or production forecasting service.
+
+The production topology is one public origin:
 
 ```text
 Vercel project root
@@ -122,21 +135,26 @@ creation, safe extraction, manifest validation, FastAPI/service smoke checks,
 and uploads the archive, SHA file, and small metadata JSON as an Actions
 artifact. It does not deploy, publish a GitHub Release, or grant write access.
 
-The feature-branch local bundle test is not the canonical main bundle. The
-canonical bundle is **not yet created in this deployment-preparation stage**.
+The canonical serving bundle is published as an immutable commit-pinned GitHub
+Release asset:
 
-After this PR is merged, the owner/ChatGPT should:
+- release tag: `serving-bundle-de31c1e949faacf1af2d8979b46edda72d4f0428`
+- source commit: `de31c1e949faacf1af2d8979b46edda72d4f0428`
+- archive SHA-256: `d3301ed1b2d06fcd205cb9b78b2a37c954333a6e99b4743ceb4b16cda4a9d1a1`
 
-1. run the manual workflow from protected green `main`;
-2. inspect the archive, metadata, and SHA artifact;
-3. publish the archive as a public, immutable, pinned release asset;
-4. create the Vercel Hobby project with repository root as its root directory;
-5. configure `CO2_SERVING_BUNDLE_URL` and `CO2_SERVING_BUNDLE_SHA256` without
-   putting credentials in the URL;
-6. deploy from protected green `main`;
-7. verify all public API endpoints and all five pages at desktop/mobile widths;
-8. inspect console/network behavior before adding any public URL to README or
-   GitHub About.
+The Vercel Production environment uses that pinned release URL together with the
+matching SHA-256. Startup downloads the archive, validates the outer checksum,
+extracts it safely, and revalidates every manifest-governed artifact before the
+API reports ready.
+
+Final delivery verification completed in this order:
+
+1. protected `main` CI and CodeQL passed after the dashboard-root serving fix;
+2. Vercel Production reached `READY` on the merged SHA;
+3. the root plus all six API endpoints were verified publicly;
+4. all five dashboard destinations passed live desktop/mobile Playwright checks;
+5. production runtime logs were checked for 5xx and error/fatal events;
+6. the canonical alias was approved for README and GitHub About use.
 
 ## Runtime limitations and rollback
 
