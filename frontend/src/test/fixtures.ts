@@ -1,4 +1,19 @@
-import type { ForecastResponse, ModelInfo } from '../types/api'
+import type { AnomalyPoint, ForecastResponse, HistoricalPoint, ModelInfo } from '../types/api'
+
+export const historicalFixture: HistoricalPoint[] = [
+  { date: '2001-11-30', co2: 371.25, rolling_mean_12: 370.8 },
+  { date: '2001-12-31', co2: 371.7, rolling_mean_12: 371.1 },
+]
+
+export const anomalyFixture: AnomalyPoint[] = Array.from({ length: 8 }, (_, index) => ({
+  date: `1990-0${index + 1}-28`,
+  co2: 350 + index,
+  residual_ppm: null,
+  residual_anomaly: false,
+  isolation_score: -0.2,
+  isolation_forest_anomaly: true,
+  methods: ['isolation_forest'],
+}))
 
 export const forecastFixture: ForecastResponse = {
   model: 'SARIMA',
