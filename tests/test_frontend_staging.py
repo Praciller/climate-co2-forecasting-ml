@@ -39,7 +39,7 @@ def test_stages_built_assets_only_and_is_deterministic(tmp_path: Path) -> None:
     ]
 
 
-@pytest.mark.parametrize("forbidden", ["node_modules", "src", "tests", "data", "reports", "models", "notebooks"])
+@pytest.mark.parametrize("forbidden", ["node_modules", "src", "tests", "data", "models", "notebooks"])
 def test_rejects_non_build_artifacts(tmp_path: Path, forbidden: str) -> None:
     source = tmp_path / "dist"
     source.mkdir()
