@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TimeSeriesChart } from './TimeSeriesChart'
 
 const meta = {
-  title: 'Components/TimeSeriesChart',
+  title: 'Charts/TimeSeriesChart',
   component: TimeSeriesChart,
   tags: ['autodocs', 'test'],
 } satisfies Meta<typeof TimeSeriesChart>

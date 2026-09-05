@@ -16,8 +16,9 @@ test('overview communicates the historical evidence boundary @desktop @mobile', 
   page,
 }) => {
   await expect(page.getByText(/does not ingest current atmospheric data/)).toBeVisible()
-  await expect(metricCard(page, 'Selected by development').getByText('SARIMA')).toBeVisible()
-  await expect(page.getByText(/final-test metrics are not used to retune or replace it/)).toBeVisible()
+  const selectionRegion = page.getByRole('region', { name: 'Model selection' })
+  await expect(selectionRegion.getByRole('heading', { name: 'SARIMA', exact: true })).toBeVisible()
+  await expect(selectionRegion.getByText(/final test evaluates after selection; it does not choose or replace the serving model/i)).toBeVisible()
   await expect(page.getByText(/exploratory signals, not verified events/)).toBeVisible()
 })
 
@@ -26,7 +27,7 @@ test('data explorer presents historical provenance and preparation @desktop @mob
 }, testInfo) => {
   await navigateToPage(page, testInfo, 'Data Explorer')
   await expect(page.getByText(/historical evidence, not a live atmospheric reading/)).toBeVisible()
-  await expect(metricCard(page, 'Monthly rows').getByText('526')).toBeVisible()
+  await expect(metricCard(page, 'Monthly rows').locator('dd')).toContainText('526')
   await expect(page.getByText('Preparation lineage', { exact: true })).toBeVisible()
   await expect(page.getByText('Historical only', { exact: true })).toBeVisible()
   await expectNoPageOverflow(page)
@@ -37,7 +38,7 @@ test('forecasting keeps origin, protocol, and interval limitations visible @desk
 }, testInfo) => {
   await navigateToPage(page, testInfo, 'Forecasting')
   await expect(page.getByText(/SARIMA · fixed-origin multi-step forecast from 2001-12-31/)).toBeVisible()
-  await expect(page.getByText('90% nominal', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Forecast reading guide' }).locator('..').getByText('90% prediction interval', { exact: true })).toBeVisible()
   await expect(page.getByRole('img', { name: /Historical CO2 and fixed-origin forecast/ })).toBeVisible()
   await expect(page.getByText(/no separately established multi-horizon coverage/)).toBeVisible()
 })
@@ -47,7 +48,7 @@ test('anomaly page preserves method counts and exploratory language @desktop @mo
 }, testInfo) => {
   await navigateToPage(page, testInfo, 'Anomaly Detection')
   await expect(metricCard(page, 'Isolation Forest').getByText('8')).toBeVisible()
-  await expect(metricCard(page, 'Residual-threshold signal').getByText('0')).toBeVisible()
+  await expect(metricCard(page, 'Residual-threshold signal').locator('dd')).toContainText('0')
   await expect(page.getByText(/not verified climate events/)).toBeVisible()
   await expect(
     page.getByRole('cell', { name: 'Isolation Forest only', exact: true }),
@@ -58,10 +59,11 @@ test('model evaluation separates development selection from final-test ranking @
   page,
 }, testInfo) => {
   await navigateToPage(page, testInfo, 'Model Evaluation')
-  await expect(page.getByText(/SARIMA was selected using/)).toBeVisible()
-  await expect(page.getByText(/Exponential Smoothing has the lowest final-test MAE/)).toBeVisible()
-  await expect(page.getByText('Selected by development', { exact: true })).toBeVisible()
-  await expect(metricCard(page, 'Lowest final-test MAE')).toContainText(
-    'Lowest final-test MAE',
-  )
+  const selectionRegion = page.getByRole('region', { name: 'Model selection' })
+  await expect(selectionRegion.getByText(/Selection uses mean rolling-origin development-fold MAE/)).toBeVisible()
+  await expect(selectionRegion.getByText('Exponential Smoothing', { exact: true })).toBeVisible()
+  await expect(selectionRegion.getByText('Selected by development', { exact: true })).toBeVisible()
+  await expect(selectionRegion.getByRole('heading', { name: 'Lowest final-test MAE' })).toBeVisible()
+  await expect(selectionRegion.getByText('0.237 ppm', { exact: true })).toBeVisible()
+  await expect(selectionRegion.getByText(/final test evaluates after selection; it does not choose or replace the serving model/i)).toBeVisible()
 })

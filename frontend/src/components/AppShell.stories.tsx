@@ -2,18 +2,25 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
 import { AppShell } from './AppShell'
+import { ThemeProvider } from '../theme/ThemeProvider'
 
 const meta = {
-  title: 'Components/AppShell',
+  title: 'Layout/AppShell',
   component: AppShell,
   tags: ['autodocs', 'test'],
   parameters: {
     layout: 'fullscreen',
   },
+  decorators: [
+    (Story) => (
+      <ThemeProvider defaultTheme="light">
+        <Story />
+      </ThemeProvider>
+    ),
+  ],
   args: {
     activePage: 'overview',
     apiStatus: 'connected',
-    pageTitle: 'Overview',
     onNavigate: fn(),
     children: <p>Historical evidence overview</p>,
   },
@@ -33,7 +40,6 @@ export const Connecting: Story = {
 export const ActiveForecasting: Story = {
   args: {
     activePage: 'forecasting',
-    pageTitle: 'Forecasting',
     children: <p>Fixed-origin historical projection</p>,
   },
 }

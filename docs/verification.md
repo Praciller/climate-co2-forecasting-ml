@@ -108,7 +108,7 @@ npm run test:storybook
 npm audit --audit-level=high
 ```
 
-The CI frontend job runs the same checks. The unit suite covers MetricCard,
+The CI frontend job runs the same checks. The unit suite covers MetricDefinition,
 LoadingState, ErrorMessage, ModelComparisonTable, and AppShell. Storybook
 stories cover those components and enforce configured accessibility checks.
 
@@ -280,6 +280,38 @@ CI uploads `playwright-report/` and `test-results/` on failure. The scoped
 becomes modified/untracked; it does not apply a blanket repository dirty-tree
 policy. Runtime-only manifests, interval/residual reports, validation
 predictions, and model binaries remain untracked under the Issue #15 policy.
+
+## Issue #25 design system v2 verification
+
+Issue #25 implements the approved design specification from PR #27
+(`f9463bcdafeea94e30d66640decf8ce7724e79bd`) on the isolated
+`feat/design-system-v2` branch. The frontend verification route is:
+
+```text
+npm ci
+npm run lint
+npm run test
+npm run build
+npm run build-storybook
+npm run test:storybook
+npm run test:e2e
+npm run test:e2e:verify-baselines
+npm audit --audit-level=high
+```
+
+The unit suite covers theme persistence/system resolution, the shell, domain
+evidence modules, and chart grammar. Browser checks cover all five pages,
+selection/evaluation semantics, fixed-origin forecast language, anomaly method
+counts, keyboard focus, mobile navigation/reflow, and deterministic API
+recovery. Storybook's browser project covers the shared component catalog and
+fails on configured accessibility violations.
+
+The theme contract is light/dark/system with localStorage key
+`co2-forecast-lab-theme`; visual checks force light mode through an init script
+so snapshot output is deterministic. The four focused visual regions remain
+Linux/Chromium release evidence: Overview desktop, Model Evaluation desktop,
+Forecast desktop, and Overview mobile shell. Windows-created `*-win32.png`
+files are not release evidence and must not be committed.
 
 ## Issue #8 CI governance
 

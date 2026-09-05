@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { AnomalyTimeline } from './AnomalyTimeline'
 
 const meta = {
-  title: 'Components/AnomalyTimeline',
+  title: 'Charts/AnomalyTimeline',
   component: AnomalyTimeline,
   tags: ['autodocs', 'test'],
 } satisfies Meta<typeof AnomalyTimeline>

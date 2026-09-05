@@ -15,6 +15,12 @@ test('the shell supports keyboard navigation across every page @desktop @mobile'
   await waitForDashboard(page)
 
   const navigation = pageNavigation(page, testInfo)
+  if (testInfo.project.name === 'mobile') {
+    if (!(await navigation.isVisible())) {
+      await page.getByRole('button', { name: 'Open navigation' }).click()
+    }
+  }
+  await expect(navigation).toBeVisible()
   const buttons = navigation.getByRole('button')
   await expect(buttons).toHaveCount(PAGE_LABELS.length)
 
@@ -25,6 +31,10 @@ test('the shell supports keyboard navigation across every page @desktop @mobile'
 
   for (const label of PAGE_LABELS) {
     await navigateToPage(page, testInfo, label)
+    if (testInfo.project.name === 'mobile') {
+      await page.getByRole('button', { name: 'Open navigation' }).click()
+      await expect(pageNavigation(page, testInfo)).toBeVisible()
+    }
     await expect(
       pageNavigation(page, testInfo)
         .getByRole('button', { name: label, exact: true }),

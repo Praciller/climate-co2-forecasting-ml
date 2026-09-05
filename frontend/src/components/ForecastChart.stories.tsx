@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ForecastChart } from './ForecastChart'
 
 const meta = {
-  title: 'Components/ForecastChart',
+  title: 'Charts/ForecastChart',
   component: ForecastChart,
   tags: ['autodocs', 'test'],
   parameters: {

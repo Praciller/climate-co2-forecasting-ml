@@ -8,6 +8,20 @@
       content="Atmospheric CO2 forecasting, model evaluation, and exploratory anomaly detection."
     />
     <title>CO2 Forecast Lab</title>
+    <script>
+      (() => {
+        const key = 'co2-forecast-lab-theme'
+        let stored = null
+        try {
+          stored = localStorage.getItem(key)
+        } catch {
+          // Continue with the system preference when storage is unavailable.
+        }
+        const theme = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
+        const dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.add(dark ? 'dark' : 'light')
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

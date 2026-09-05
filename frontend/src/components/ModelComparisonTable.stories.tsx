@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ModelComparisonTable } from './ModelComparisonTable'
 
 const meta = {
-  title: 'Components/ModelComparisonTable',
+  title: 'Domain/ModelComparisonTable',
   component: ModelComparisonTable,
   tags: ['autodocs', 'test'],
 } satisfies Meta<typeof ModelComparisonTable>

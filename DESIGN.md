@@ -1,5 +1,5 @@
 ---
-version: "1.0"
+version: "2.0"
 name: "CO2 Forecast Lab"
 description: "A calm scientific data workbench for inspecting historical CO2 evidence, model evaluation, forecasts, uncertainty, and exploratory anomaly signals."
 product_archetype: "scientific analytics dashboard"
@@ -49,6 +49,12 @@ layout:
   pageGutterMobile: "16px"
   gridColumnsDesktop: 12
   minimumTouchTarget: "44px"
+implementation:
+  primitiveFoundation: "shadcn CLI with Base UI primitives"
+  tokenSource: "frontend/src/index.css"
+  themeStorageKey: "co2-forecast-lab-theme"
+  themeModes: ["light", "dark", "system"]
+  storybookTaxonomy: ["Foundations", "Primitives", "Layout", "Domain", "Charts", "States"]
 components:
   panel:
     background: "{colors.surface}"
@@ -286,6 +292,16 @@ Before a frontend PR is ready:
 7. Confirm loading, empty/error, keyboard focus, and API-unavailable behavior for affected surfaces.
 8. Capture/update reviewer screenshots only after the implementation passes checks.
 
-## Known gaps to close
+## Implementation status
 
-The current repository does not yet have a complete executable component catalog, frontend unit/component test suite, Playwright E2E/visual regression gate, or automated accessibility gate. Add those deliberately as separate SDLC work rather than hiding them behind this design document.
+The v2 contract is implemented in `frontend/`: the token source is
+`frontend/src/index.css`, theme preference is persisted under
+`co2-forecast-lab-theme`, shared UI primitives are Base UI-backed shadcn
+components, and Storybook stories are grouped by the taxonomy above. The
+application has browser coverage for the five pages, keyboard navigation,
+mobile reflow, API recovery, and four focused visual regions.
+
+Visual snapshots are release evidence and must be generated/reviewed in the
+canonical Linux/Chromium environment described in `docs/verification.md`.
+Native Windows runs are for semantic verification and must not overwrite the
+Linux baselines.
