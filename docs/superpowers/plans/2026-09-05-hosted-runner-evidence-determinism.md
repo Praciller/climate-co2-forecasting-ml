@@ -26,21 +26,21 @@ GitHub-hosted jobs.
       numerical implementation contracts.
 - [x] Compare canonical and failing hosted-run metadata and logs; mark missing
       CPU/dispatch fields as unobserved rather than inferred.
-- [ ] Add and push the branch-only three-replica diagnostic workflow.
-- [ ] Capture bounded CPU, OpenBLAS, NumPy, threadpoolctl, PyTorch, package,
+- [x] Add and push the branch-only three-replica diagnostic workflow.
+- [x] Capture bounded CPU, OpenBLAS, NumPy, threadpoolctl, PyTorch, package,
       hash, summary, delta, and evidence-bundle artifacts.
-- [ ] Run the unmodified deterministic environment baseline and compare all
+- [x] Run the unmodified deterministic environment baseline and compare all
       replicas, including PNG hashes and numeric deltas.
-- [ ] Test one dispatch-control hypothesis at a time: OpenBLAS, then NumPy,
+- [x] Test one dispatch-control hypothesis at a time: OpenBLAS, then NumPy,
       then PyTorch only if the evidence requires it.
-- [ ] Require at least three independent byte-identical final candidate runs;
+- [x] Require at least three independent byte-identical final candidate runs;
       attempt up to five when necessary and report CPU diversity honestly.
-- [ ] Update only the proven permanent environment in `ci.yml` and
+- [x] Update only the proven permanent environment in `ci.yml` and
       `serving-bundle.yml`, then remove the probe workflow.
-- [ ] If the proven Linux contract changes governed evidence, refresh only the
+- [x] If the proven Linux contract changes governed evidence, refresh only the
       policy-defined tracked files from a GitHub Ubuntu artifact and inspect the
       scientific invariants before committing.
-- [ ] Update the narrow verification/deployment documentation and retain the
+- [x] Update the narrow verification/deployment documentation and retain the
       strict exact drift policy.
 - [ ] Run authoritative backend, frontend, browser, repository, container,
       notebook, and API checks; verify no source/model/UI/snapshot drift.
