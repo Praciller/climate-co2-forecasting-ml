@@ -1,41 +1,70 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ThemeProvider } from '../theme/ThemeProvider'
 import { AppShell } from './AppShell'
 
+function renderShell(activePage: 'overview' | 'data' | 'forecasting' | 'anomalies' | 'evaluation' = 'forecasting') {
+  return render(
+    <ThemeProvider>
+      <AppShell
+        activePage={activePage}
+        apiStatus="connected"
+        onNavigate={vi.fn()}
+      >
+        <h1 id="page-heading" tabIndex={-1}>Forecasting</h1>
+      </AppShell>
+    </ThemeProvider>,
+  )
+}
+
 describe('AppShell', () => {
-  it('exposes the active page and navigates from keyboard-friendly buttons', async () => {
+  it('exposes five flat destinations and one active primary item', () => {
+    renderShell()
+
+    const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
+    const buttons = within(navigation).getAllByRole('button')
+    expect(buttons).toHaveLength(5)
+    expect(within(navigation).getByRole('button', { name: 'Forecasting' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('API connected')
+  })
+
+  it('opens the named mobile Sheet and closes it after navigating', async () => {
     const onNavigate = vi.fn()
     const user = userEvent.setup()
-
     render(
-      <AppShell
-        activePage="forecasting"
-        apiStatus="connected"
-        pageTitle="Forecasting"
-        onNavigate={onNavigate}
-      >
-        <p>Fixed-origin historical projection</p>
-      </AppShell>,
+      <ThemeProvider>
+        <AppShell activePage="overview" apiStatus="connected" onNavigate={onNavigate}>
+          <h1 id="page-heading" tabIndex={-1}>Overview</h1>
+        </AppShell>
+      </ThemeProvider>,
     )
 
-    expect(screen.getByRole('heading', { name: 'Forecasting' })).toBeVisible()
-    expect(screen.getByText('API connected')).toBeVisible()
-    expect(screen.getByText('Fixed-origin historical projection')).toBeVisible()
+    const trigger = screen.getByRole('button', { name: 'Open navigation' })
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog')
+    await user.click(trigger)
 
-    const forecastingButtons = screen.getAllByRole('button', { name: 'Forecasting' })
-    expect(forecastingButtons).toHaveLength(2)
-    forecastingButtons.forEach((button) => {
-      expect(button).toHaveAttribute('aria-current', 'page')
-    })
+    const dialog = await screen.findByRole('dialog', { name: 'Primary navigation' })
+    const forecasting = within(dialog).getByRole('button', { name: 'Forecasting' })
+    expect(forecasting).toHaveClass('min-h-11')
+    await user.click(forecasting)
 
-    await user.click(
-      within(screen.getByRole('navigation', { name: 'Primary navigation' })).getByRole(
-        'button',
-        { name: 'Data Explorer' },
-      ),
-    )
-    expect(onNavigate).toHaveBeenCalledWith('data')
+    expect(onNavigate).toHaveBeenCalledWith('forecasting')
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Primary navigation' })).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Overview' })).toHaveFocus())
+  })
+
+  it('provides an accessible theme control with all three choices', async () => {
+    const user = userEvent.setup()
+    renderShell()
+
+    await user.click(screen.getByRole('button', { name: /Theme:/ }))
+    expect(await screen.findByRole('menuitemradio', { name: 'Light' })).toBeVisible()
+    expect(screen.getByRole('menuitemradio', { name: 'Dark' })).toBeVisible()
+    expect(screen.getByRole('menuitemradio', { name: 'System' })).toBeVisible()
   })
 })

@@ -12,14 +12,6 @@ const ForecastingPage = lazy(() => import('./pages/ForecastingPage'))
 const ModelEvaluationPage = lazy(() => import('./pages/ModelEvaluationPage'))
 const OverviewPage = lazy(() => import('./pages/OverviewPage'))
 
-const PAGE_TITLES: Record<PageId, string> = {
-  overview: 'Overview',
-  data: 'Data Explorer',
-  forecasting: 'Forecasting',
-  anomalies: 'Anomaly Detection',
-  evaluation: 'Model Evaluation',
-}
-
 function App() {
   const [page, setPage] = useState<PageId>('overview')
   const { data, error, isLoading, reload } = useDashboardData()
@@ -66,7 +58,6 @@ function App() {
     <AppShell
       activePage={page}
       apiStatus={isLoading ? 'connecting' : data && !error ? 'connected' : 'unavailable'}
-      pageTitle={PAGE_TITLES[page]}
       onNavigate={setPage}
     >
       <Suspense fallback={<LoadingState />}>{content}</Suspense>
