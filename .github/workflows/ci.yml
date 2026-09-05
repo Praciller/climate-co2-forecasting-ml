@@ -9,15 +9,28 @@ permissions:
 
 jobs:
   backend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      MPLBACKEND: Agg
+      TZ: UTC
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.11.16"
           cache: pip
-      - run: pip install -r requirements.txt
+          cache-dependency-path: |
+            requirements.txt
+            constraints/evidence-linux-py311.txt
+      - run: pip install -r requirements.txt -c constraints/evidence-linux-py311.txt
       - run: ruff check src tests
       - name: Regenerate governed evidence
         run: python -m src.pipeline
@@ -60,8 +73,18 @@ jobs:
       - run: npm audit --audit-level=high
 
   browser-e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      MPLBACKEND: Agg
+      TZ: UTC
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     defaults:
       run:
         working-directory: frontend
@@ -69,9 +92,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.11.16"
           cache: pip
-      - run: pip install -r requirements.txt
+          cache-dependency-path: |
+            requirements.txt
+            constraints/evidence-linux-py311.txt
+      - run: pip install -r requirements.txt -c constraints/evidence-linux-py311.txt
         working-directory: .
       - uses: actions/setup-node@v6
         with:

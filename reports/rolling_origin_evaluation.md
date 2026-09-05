@@ -32,7 +32,7 @@ Values are mean ± population standard deviation across folds; the median is ret
 | Model | MAE | RMSE | sMAPE | MASE |
 |---|---:|---:|---:|---:|
 | SARIMA | 0.239 ± 0.067 | 0.284 ± 0.072 | 0.067% ± 0.019 | 0.195 ± 0.054 |
-| Exponential Smoothing | 0.270 ± 0.082 | 0.318 ± 0.087 | 0.076% ± 0.023 | 0.220 ± 0.066 |
+| Exponential Smoothing | 0.272 ± 0.084 | 0.319 ± 0.089 | 0.076% ± 0.024 | 0.221 ± 0.068 |
 | Naive | 1.126 ± 0.143 | 1.257 ± 0.143 | 0.316% ± 0.040 | 0.917 ± 0.115 |
 | Seasonal Naive | 1.278 ± 0.458 | 1.318 ± 0.455 | 0.359% ± 0.127 | 1.042 ± 0.377 |
 
