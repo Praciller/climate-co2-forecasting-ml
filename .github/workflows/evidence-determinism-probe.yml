@@ -1,0 +1,264 @@
+name: Temporary evidence determinism probe
+
+on:
+  push:
+    branches:
+      - fix/hosted-runner-evidence-determinism
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+          - baseline
+        replica:
+          - 1
+          - 2
+          - 3
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      MPLBACKEND: Agg
+      TZ: UTC
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11.16"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            constraints/evidence-linux-py311.txt
+
+      - name: Install canonical dependencies
+        run: python -m pip install -r requirements.txt -c constraints/evidence-linux-py311.txt
+
+      - name: Apply dispatch candidate
+        shell: bash
+        run: |
+          case "${{ matrix.mode }}" in
+            baseline)
+              ;;
+            openblas)
+              echo "OPENBLAS_CORETYPE=Haswell" >> "$GITHUB_ENV"
+              ;;
+            openblas_numpy)
+              echo "OPENBLAS_CORETYPE=Haswell" >> "$GITHUB_ENV"
+              echo "NPY_DISABLE_CPU_FEATURES=X86_V3,X86_V4" >> "$GITHUB_ENV"
+              ;;
+            openblas_numpy_torch)
+              echo "OPENBLAS_CORETYPE=Haswell" >> "$GITHUB_ENV"
+              echo "NPY_DISABLE_CPU_FEATURES=X86_V3,X86_V4" >> "$GITHUB_ENV"
+              echo "ATEN_CPU_CAPABILITY=default" >> "$GITHUB_ENV"
+              ;;
+            *)
+              echo "Unknown probe mode: ${{ matrix.mode }}" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Capture runtime fingerprint
+        shell: bash
+        env:
+          OPENBLAS_VERBOSE: "2"
+        run: |
+          set -o pipefail
+          mkdir -p "$RUNNER_TEMP/probe-output"
+          {
+            echo "mode=${{ matrix.mode }}"
+            echo "replica=${{ matrix.replica }}"
+            echo "runner_os=${RUNNER_OS:-unknown}"
+            echo "image_os=${ImageOS:-unknown}"
+            echo "image_version=${ImageVersion:-unknown}"
+            echo "--- uname -a ---"
+            uname -a
+            echo "--- lscpu ---"
+            lscpu
+            echo "--- Python and libraries ---"
+            python - <<'PY'
+            import json
+            import os
+            import platform
+
+            import numpy as np
+            import torch
+            from threadpoolctl import threadpool_info
+
+            print("platform.platform=", platform.platform())
+            print("platform.machine=", platform.machine())
+            print("platform.processor=", platform.processor())
+            print("numpy.version=", np.__version__)
+            print("numpy.show_config=")
+            np.show_config()
+            print("numpy.show_runtime=")
+            np.show_runtime()
+            print("threadpoolctl.info=")
+            print(json.dumps(threadpool_info(), indent=2, sort_keys=True))
+            print("torch.version=", torch.__version__)
+            print("torch.num_threads=", torch.get_num_threads())
+            print("torch.num_interop_threads=", torch.get_num_interop_threads())
+            cpu_backend = getattr(torch.backends, "cpu", None)
+            capability = (
+                cpu_backend.get_cpu_capability()
+                if cpu_backend is not None
+                and hasattr(cpu_backend, "get_cpu_capability")
+                else "unexposed"
+            )
+            print("torch.cpu_capability=", capability)
+            print("torch.parallel_info=")
+            print(torch.__config__.parallel_info())
+            print("selected_dispatch_environment=")
+            for name in (
+                "OPENBLAS_CORETYPE",
+                "NPY_DISABLE_CPU_FEATURES",
+                "ATEN_CPU_CAPABILITY",
+                "OPENBLAS_VERBOSE",
+            ):
+                print(f"{name}={os.environ.get(name, '<unset>')}")
+            PY
+            echo "--- OpenBLAS probe-only dispatch ---"
+            python -c "import numpy as np; np.dot(np.ones((2, 2)), np.ones((2, 2)))"
+            echo "--- pip freeze ---"
+            python -m pip freeze | sort
+          } > "$RUNNER_TEMP/probe-output/fingerprint.txt" 2>&1
+          sed -n '1,260p' "$RUNNER_TEMP/probe-output/fingerprint.txt"
+
+      - name: Validate dispatch candidate
+        if: matrix.mode != 'baseline'
+        shell: bash
+        run: |
+          set -euo pipefail
+          OPENBLAS_VERBOSE=2 python - <<'PY' 2>&1 | tee "$RUNNER_TEMP/probe-output/dispatch-validation.txt"
+          import json
+          import os
+
+          import numpy as np
+          import torch
+          from threadpoolctl import threadpool_info
+
+          mode = os.environ["PROBE_MODE"] if "PROBE_MODE" in os.environ else "${{ matrix.mode }}"
+          print("mode=", mode)
+          print("threadpoolctl=", json.dumps(threadpool_info(), indent=2, sort_keys=True))
+          np.show_runtime()
+          capability = getattr(getattr(torch.backends, "cpu", None), "get_cpu_capability", None)
+          print("torch.cpu_capability=", capability() if capability else "unexposed")
+          print("ATEN_CPU_CAPABILITY=", os.environ.get("ATEN_CPU_CAPABILITY", "<unset>"))
+          if mode in {"openblas", "openblas_numpy", "openblas_numpy_torch"}:
+              openblas = [
+                  item for item in threadpool_info()
+                  if item.get("internal_api") == "openblas"
+              ]
+              if not openblas or not any(item.get("architecture") == "Haswell" for item in openblas):
+                  raise SystemExit("OpenBLAS did not validate the Haswell dispatch target")
+          if mode in {"openblas_numpy", "openblas_numpy_torch"}:
+              if os.environ.get("NPY_DISABLE_CPU_FEATURES") != "X86_V3,X86_V4":
+                  raise SystemExit("NumPy restriction was not applied")
+          if mode == "openblas_numpy_torch":
+              if os.environ.get("ATEN_CPU_CAPABILITY") != "default":
+                  raise SystemExit("PyTorch capability restriction was not applied")
+          PY
+
+      - name: Generate governed evidence
+        run: python -m src.pipeline
+
+      - name: Collect probe evidence
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv
+          import hashlib
+          import json
+          import tarfile
+          from pathlib import Path
+
+          from scripts.verify_generated_evidence import parse_artifact_policy, select_policy_paths
+
+          root = Path.cwd()
+          output = Path("${{ runner.temp }}") / "probe-output"
+          verification = (root / "docs" / "verification.md").read_text(encoding="utf-8")
+          tracked = [
+              path for path in (
+                  item.decode("utf-8")
+                  for item in __import__("subprocess").check_output(
+                      ["git", "ls-files", "-z", "--cached"], cwd=root
+                  ).split(b"\0")
+                  if item
+              )
+          ]
+          policy_paths = select_policy_paths(tracked, parse_artifact_policy(verification))
+          hash_lines = []
+          for relative in policy_paths:
+              path = root / Path(*Path(relative).parts)
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              hash_lines.append(f"{digest}  {relative}")
+          (output / "governed-evidence.sha256").write_text(
+              "\n".join(hash_lines) + "\n", encoding="utf-8"
+          )
+
+          forecast = json.loads((root / "reports" / "forecast_metrics.json").read_text())
+          interval = json.loads((root / "reports" / "forecast_interval_evaluation.json").read_text())
+          anomalies = list(csv.DictReader((root / "reports" / "anomalies.csv").open(encoding="utf-8")))
+          final_models = forecast["final_test"]["models"]
+          lowest = min(final_models.items(), key=lambda item: item[1]["mae"])
+          summary = {
+              "selected_model": forecast["selection"]["selected_model"],
+              "development_mae": forecast["validation"]["models"][forecast["selection"]["selected_model"]]["mae"],
+              "final_test_mae": final_models[forecast["selection"]["selected_model"]]["mae"],
+              "final_test_lowest_model": lowest[0],
+              "final_test_lowest_mae": lowest[1]["mae"],
+              "interval_coverage": interval["empirical_coverage"],
+              "isolation_forest_count": sum(row["isolation_forest_anomaly"] == "True" for row in anomalies),
+              "residual_count": sum(row["residual_anomaly"] == "True" for row in anomalies),
+              "anomaly_count": len(anomalies),
+              "anomaly_rows": [
+                  {
+                      "date": row["date"],
+                      "residual_ppm": float(row["residual_ppm"]),
+                      "isolation_score": float(row["isolation_score"]),
+                      "residual_anomaly": row["residual_anomaly"] == "True",
+                      "isolation_forest_anomaly": row["isolation_forest_anomaly"] == "True",
+                  }
+                  for row in anomalies
+              ],
+              "predictions": {},
+          }
+          for model in ("sarima", "exponential_smoothing"):
+              with (root / "reports" / "predictions" / f"{model}.csv").open(encoding="utf-8") as handle:
+                  summary["predictions"][model] = [
+                      float(row["prediction"]) for row in csv.DictReader(handle)
+                  ]
+          (output / "numerical-summary.json").write_text(
+              json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+
+          archive = output / "governed-evidence.tar.gz"
+          with tarfile.open(archive, "w:gz") as bundle:
+              for relative in policy_paths:
+                  bundle.add(root / Path(*Path(relative).parts), arcname=relative)
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          print(f"policy_file_count={len(policy_paths)}")
+          PY
+
+      - name: Upload probe artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-${{ matrix.mode }}-${{ matrix.replica }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/probe-output/
+          if-no-files-found: warn
+          retention-days: 3
