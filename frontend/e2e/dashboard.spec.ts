@@ -16,7 +16,9 @@ test('overview communicates the historical evidence boundary @desktop @mobile', 
   page,
 }) => {
   await expect(page.getByText(/does not ingest current atmospheric data/)).toBeVisible()
-  await expect(metricCard(page, 'Selected by development').getByText('SARIMA')).toBeVisible()
+  await expect(
+    metricCard(page, 'Selected by development').getByRole('heading', { name: 'SARIMA', exact: true }),
+  ).toBeVisible()
   await expect(page.getByText(/final-test metrics are not used to retune or replace it/)).toBeVisible()
   await expect(page.getByText(/exploratory signals, not verified events/)).toBeVisible()
 })

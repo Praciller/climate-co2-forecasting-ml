@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MetricCard } from './MetricCard'
 
 const meta = {
-  title: 'Components/MetricCard',
+  title: 'Foundations/MetricCard',
   component: MetricCard,
   tags: ['autodocs', 'test'],
 } satisfies Meta<typeof MetricCard>

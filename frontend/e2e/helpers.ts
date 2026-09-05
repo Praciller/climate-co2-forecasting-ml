@@ -32,12 +32,21 @@ export async function navigateToPage(
   testInfo: TestInfo,
   label: (typeof PAGE_LABELS)[number],
 ) {
-  await pageNavigation(page, testInfo)
+  const navigation = pageNavigation(page, testInfo)
+  if (testInfo.project.name === 'mobile') {
+    if (!(await navigation.isVisible())) {
+      await page.getByRole('button', { name: 'Open navigation' }).click()
+    }
+  }
+  await navigation
     .getByRole('button', { name: label, exact: true })
     .click()
   await expect(
     page.getByRole('heading', { level: 1, name: label, exact: true }),
   ).toBeVisible()
+  if (testInfo.project.name === 'mobile') {
+    await expect(navigation).toBeHidden()
+  }
 }
 
 export function metricCard(page: Page, label: string) {
@@ -63,5 +72,11 @@ export async function freezeAnimations(page: Page) {
         caret-color: transparent !important;
       }
     `,
+  })
+}
+
+export async function setDeterministicLightTheme(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('co2-forecast-lab-theme', 'light')
   })
 }

@@ -10,7 +10,7 @@ export function ForecastEvidence({ forecast, historical }: ForecastEvidenceProps
   return (
     <section aria-labelledby="forecast-evidence-heading" className="rounded-lg border border-border bg-card p-5">
       <h2 id="forecast-evidence-heading" className="section-heading">Forecast evidence</h2>
-      <p className="mt-1 text-sm leading-6 text-muted-foreground">A fixed-origin multi-step forecast from the governed historical model artifact.</p>
+      <p className="mt-1 text-sm leading-6 text-muted-foreground">{forecast.model} · {forecast.protocol} from {forecast.forecast_origin} · model version {forecast.model_version}.</p>
       <dl className="mt-5 grid gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
         <div><dt className="text-xs text-muted-foreground">Model</dt><dd className="mt-1 font-medium">{forecast.model} · {forecast.model_version}</dd></div>
         <div><dt className="text-xs text-muted-foreground">Forecast origin</dt><dd className="mt-1 font-medium">{forecast.forecast_origin}</dd></div>

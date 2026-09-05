@@ -166,7 +166,7 @@ export function AppShell({
                       <SheetTitle>Primary navigation</SheetTitle>
                       <SheetDescription>CO2 Forecast Lab destinations</SheetDescription>
                     </SheetHeader>
-                    <nav className="space-y-1 px-3 py-5" aria-label="Mobile destinations">
+                    <nav className="space-y-1 px-3 py-5" aria-label="Mobile navigation">
                       <NavigationItems
                         activePage={activePage}
                         onNavigate={navigateFromShell}

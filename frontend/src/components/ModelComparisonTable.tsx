@@ -32,7 +32,7 @@ export function ModelComparisonTable({
               key={name}
               className={`border-b border-rule/70 ${
                 name === selectedModel
-                  ? 'bg-accent-soft/70'
+                  ? 'bg-primary-muted/70'
                   : 'hover:bg-surface-muted/60'
               }`}
             >
@@ -42,7 +42,7 @@ export function ModelComparisonTable({
               <td className="px-3 py-3 text-xs text-ink-muted">
                 <div className="flex flex-wrap gap-1.5">
                   {name === selectedModel ? (
-                    <span className="rounded border border-accent px-1.5 py-0.5 font-semibold text-accent">
+                    <span className="rounded border border-primary px-1.5 py-0.5 font-semibold text-primary">
                       Selected by development
                     </span>
                   ) : null}

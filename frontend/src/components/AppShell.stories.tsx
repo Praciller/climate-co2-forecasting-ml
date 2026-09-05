@@ -5,7 +5,7 @@ import { AppShell } from './AppShell'
 import { ThemeProvider } from '../theme/ThemeProvider'
 
 const meta = {
-  title: 'Components/AppShell',
+  title: 'Layout/AppShell',
   component: AppShell,
   tags: ['autodocs', 'test'],
   parameters: {

@@ -3,10 +3,12 @@ import { expect, test } from '@playwright/test'
 import {
   freezeAnimations,
   navigateToPage,
+  setDeterministicLightTheme,
   waitForDashboard,
 } from './helpers'
 
 test('desktop overview evidence summary remains stable @desktop', async ({ page }) => {
+  await setDeterministicLightTheme(page)
   await page.goto('/')
   await waitForDashboard(page)
   await freezeAnimations(page)
@@ -20,12 +22,13 @@ test('desktop overview evidence summary remains stable @desktop', async ({ page 
 })
 
 test('desktop model-evaluation distinction remains stable @desktop', async ({ page }, testInfo) => {
+  await setDeterministicLightTheme(page)
   await page.goto('/')
   await waitForDashboard(page)
   await navigateToPage(page, testInfo, 'Model Evaluation')
   await freezeAnimations(page)
   const region = page
-    .getByRole('heading', { name: 'Development selection', exact: true })
+    .getByRole('heading', { name: 'SARIMA', exact: true })
     .locator('..')
     .locator('..')
   await expect(region).toHaveScreenshot('model-evaluation-selection.png', {
@@ -34,6 +37,7 @@ test('desktop model-evaluation distinction remains stable @desktop', async ({ pa
 })
 
 test('desktop forecast evidence area remains stable @desktop', async ({ page }, testInfo) => {
+  await setDeterministicLightTheme(page)
   await page.goto('/')
   await waitForDashboard(page)
   await navigateToPage(page, testInfo, 'Forecasting')
@@ -49,6 +53,7 @@ test('desktop forecast evidence area remains stable @desktop', async ({ page }, 
 })
 
 test('mobile overview shell remains stable @mobile', async ({ page }) => {
+  await setDeterministicLightTheme(page)
   await page.goto('/')
   await waitForDashboard(page)
   await freezeAnimations(page)

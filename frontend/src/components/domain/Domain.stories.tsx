@@ -19,7 +19,7 @@ export const Scope: Story = { render: () => <HistoricalScope period="1958-03 to 
 export const Provenance: Story = { render: () => <DataProvenance dataset={modelInfoFixture.dataset} preprocessing={modelInfoFixture.preprocessing} /> }
 export const Ready: Story = { render: () => <ReadinessStatus status="connected" /> }
 export const Limitation: Story = { render: () => <LimitationCallout>Prediction intervals are calibrated for one-step evaluation only.</LimitationCallout> }
-export const Metric: Story = { render: () => <MetricDefinition label="Final-test MAE" value="0.243 ppm" detail="Post-selection evaluation" /> }
+export const Metric: Story = { render: () => <dl><MetricDefinition label="Final-test MAE" value="0.243 ppm" detail="Post-selection evaluation" /></dl> }
 export const Selection: Story = { render: () => <ModelSelectionSummary selection={modelInfoFixture.selection} developmentMae={0.221} foldCount={5} /> }
 export const Comparison: Story = { render: () => <ModelComparison selectedModel={modelInfoFixture.selection.selected_model} finalTest={modelInfoFixture.metrics.final_test} /> }
 export const Forecast: Story = { render: () => <ForecastEvidence forecast={forecastFixture} historical={historicalFixture} /> }

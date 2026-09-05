@@ -12,7 +12,7 @@ describe('evidence domain modules', () => {
     expect(screen.getByText('Selected by development')).toBeInTheDocument()
     expect(screen.getByText('Lowest final-test MAE')).toBeInTheDocument()
     expect(screen.queryByText('Best model')).not.toBeInTheDocument()
-    expect(screen.getByText(/Final-test metrics are post-selection evaluation/)).toBeInTheDocument()
+    expect(screen.getByText(/final-test metrics are not used to retune or replace it/)).toBeInTheDocument()
   })
 
   it('uses prediction interval and fixed-origin limitation language', () => {

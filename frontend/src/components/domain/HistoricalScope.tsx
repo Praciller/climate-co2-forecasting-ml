@@ -21,12 +21,9 @@ export function HistoricalScope({ frequency, period, unit }: HistoricalScopeProp
 
 function ScopeItem({ icon: Icon, label, value }: { icon: typeof CalendarRange; label: string; value: string }) {
   return (
-    <div className="flex gap-3">
-      <Icon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-      <div>
-        <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</dt>
-        <dd className="mt-1 text-sm font-medium">{value}</dd>
-      </div>
+    <div>
+      <dt className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground"><Icon className="size-4 shrink-0 text-primary" aria-hidden="true" />{label}</dt>
+      <dd className="mt-1 text-sm font-medium">{value}</dd>
     </div>
   )
 }

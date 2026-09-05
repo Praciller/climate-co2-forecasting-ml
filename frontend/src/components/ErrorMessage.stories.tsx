@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { ErrorMessage } from './ErrorMessage'
 
 const meta = {
-  title: 'Components/ErrorMessage',
+  title: 'States/ErrorMessage',
   component: ErrorMessage,
   tags: ['autodocs', 'test'],
   args: {
