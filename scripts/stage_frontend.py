@@ -48,12 +48,18 @@ def stage_frontend(
 ) -> Path:
     """Copy validated build output into the function-visible staging directory."""
 
+    source = Path(source)
+    target = Path(target)
+    if source.is_symlink():
+        raise FrontendStageError("Frontend build output must not be a symlink.")
+    if target.is_symlink():
+        raise FrontendStageError("Frontend staging target must not be a symlink.")
     source = source.resolve()
     target = target.resolve()
     entries = _validate_source(source)
     if _paths_overlap(source, target):
         raise FrontendStageError("Frontend source and staging directories must not overlap.")
-    if target.exists() and (target.is_symlink() or not target.is_dir()):
+    if target.exists() and not target.is_dir():
         raise FrontendStageError("Frontend staging target must be a directory.")
 
     if target.exists():
