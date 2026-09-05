@@ -89,6 +89,7 @@ jobs:
             lscpu
             echo "--- Python and libraries ---"
             python - <<'PY'
+          if True:
             import json
             import os
             import platform
