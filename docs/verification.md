@@ -249,8 +249,10 @@ The one-control-at-a-time probe evidence was:
 BASELINE_RUN=33965450224: 3/3 stable on AMD EPYC 9V74 and AMD EPYC 7763
 OPENBLAS_ONLY_RUN=33965685116: 3/3 passed, but LSTM hashes varied by 3.9633218307244533e-07
 NUMPY_ONLY_RUN=33966547573: 3/3 passed, but one Intel replica diverged in governed reports
-OPENBLAS_NUMPY_RUN=33965920150: 3/3 byte-identical substantive evidence across AMD and Intel
+OPENBLAS_NUMPY_RUN=33965920150: 3/3 stable in the probe, but an independent PR runner still drifted
 PYTORCH_DEFAULT_RUN=33966180658: 3/3 passed, but LSTM hashes varied again
+DNNL_WITH_ATEN_RUN=33967207450: 3/3 byte-identical substantive evidence across AMD and Intel
+DNNL_MINIMIZED_RUN=33967405894 (attempts 1-3): 3/3 byte-identical per attempt across AMD EPYC 9V74 and EPYC 7763
 ```
 
 The permanent hosted contract therefore pins the smallest control set proven
@@ -259,6 +261,7 @@ stable across the observed CPU mix:
 ```text
 OPENBLAS_CORETYPE=Haswell
 NPY_DISABLE_CPU_FEATURES=X86_V3,X86_V4
+DNNL_MAX_CPU_ISA=AVX2
 ATEN_CPU_CAPABILITY=<unset>
 ```
 
