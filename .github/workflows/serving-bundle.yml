@@ -1,0 +1,108 @@
+name: Canonical serving bundle
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  serving-bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      MPLBACKEND: Agg
+      TZ: UTC
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    steps:
+      - name: Check out protected main
+        uses: actions/checkout@v6
+
+      - name: Set up canonical Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11.16"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            constraints/evidence-linux-py311.txt
+
+      - name: Require protected main
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            echo "::error::github.ref must be refs/heads/main for canonical serving bundle generation."
+            exit 1
+          fi
+
+      - name: Install canonical dependencies
+        run: python -m pip install -r requirements.txt -c constraints/evidence-linux-py311.txt
+
+      - name: Generate governed evidence
+        run: python -m src.pipeline
+
+      - name: Verify governed evidence drift
+        run: python scripts/verify_generated_evidence.py
+
+      - name: Verify repository guardrails
+        run: python -m src.verify_repository
+
+      - name: Package serving bundle
+        run: >-
+          python scripts/package_serving_bundle.py
+          --root "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/co2-serving-bundle.tar.gz"
+          --sha-file "$RUNNER_TEMP/co2-serving-bundle.tar.gz.sha256"
+          --metadata "$RUNNER_TEMP/co2-serving-bundle.metadata.json"
+          --source-commit "$GITHUB_SHA"
+          --environment-label "ubuntu-24.04-py3.11.16"
+
+      - name: Extract and exercise serving bundle
+        env:
+          BUNDLE_ARCHIVE: ${{ runner.temp }}/co2-serving-bundle.tar.gz
+          BUNDLE_ROOT: ${{ runner.temp }}/co2-serving-bundle-extracted
+        shell: bash
+        run: |
+          python -c "from pathlib import Path; from scripts.install_serving_bundle import extract_and_validate_bundle; extract_and_validate_bundle(Path('$BUNDLE_ARCHIVE'), Path('$BUNDLE_ROOT'))"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          from fastapi.testclient import TestClient
+
+          import src.api.main as api_main
+          from api.index import app
+          from src.api.service import ForecastService
+
+          root = Path(os.environ["BUNDLE_ROOT"])
+          api_main.resolve_serving_root = lambda: root
+          service = ForecastService(root=root)
+          assert service.ready
+          assert len(service.historical_records()) == 526
+          assert len(service.forecast(24).forecast) == 24
+          assert len(service.anomalies()) == 8
+          with TestClient(app) as client:
+              assert client.get("/api/health").status_code == 200
+              assert client.get("/api/ready").status_code == 200
+              assert client.get("/api/model-info").status_code == 200
+              assert len(client.get("/api/historical-data").json()) == 526
+              assert len(client.get("/api/forecast?horizon_months=24").json()["forecast"]) == 24
+              assert len(client.get("/api/anomalies").json()) == 8
+          PY
+
+      - name: Upload immutable bundle evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: co2-serving-bundle-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/co2-serving-bundle.tar.gz
+            ${{ runner.temp }}/co2-serving-bundle.tar.gz.sha256
+            ${{ runner.temp }}/co2-serving-bundle.metadata.json
+          if-no-files-found: error
+          retention-days: 14
