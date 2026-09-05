@@ -16,6 +16,7 @@ test('desktop overview evidence summary remains stable @desktop', async ({ page 
     .getByRole('heading', { name: 'Observed monthly concentration', exact: true })
     .locator('..')
     .locator('..')
+    .locator('..')
   await expect(region).toHaveScreenshot('overview-evidence.png', {
     animations: 'disabled',
   })
@@ -29,7 +30,6 @@ test('desktop model-evaluation distinction remains stable @desktop', async ({ pa
   await freezeAnimations(page)
   const region = page
     .getByRole('heading', { name: 'SARIMA', exact: true })
-    .locator('..')
     .locator('..')
   await expect(region).toHaveScreenshot('model-evaluation-selection.png', {
     animations: 'disabled',
@@ -45,7 +45,6 @@ test('desktop forecast evidence area remains stable @desktop', async ({ page }, 
   await freezeAnimations(page)
   const region = page
     .getByRole('heading', { name: 'Forecast evidence', exact: true })
-    .locator('..')
     .locator('..')
   await expect(region).toHaveScreenshot('forecast-evidence.png', {
     animations: 'disabled',
