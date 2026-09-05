@@ -229,11 +229,11 @@ Run `git diff --check`, `git diff --stat`, `git diff -- data reports models fron
 - Consumes: verified branch and fresh local gates.
 - Produces: an open, unmerged PR that closes #26 on merge and records production as owner-gated.
 
-- [ ] **Step 1: Push the branch and verify the remote SHA.**
+- [x] **Step 1: Push the branch and verify the remote SHA.**
 
 Run `git push -u origin feat/portfolio-deployment` and compare `git rev-parse HEAD` with `git ls-remote origin refs/heads/feat/portfolio-deployment`.
 
-- [ ] **Step 2: Create the PR with the required deployment sections and fields.**
+- [x] **Step 2: Create the PR with the required deployment sections and fields.**
 
 Include `Closes #26`, parent #24, the hosting decision, dependency isolation proof, API prefix, same-origin CORS, bundle/workflow integrity, tests, limitations, and explicit `PUBLIC_DEPLOYMENT_CREATED=NO`.
 
