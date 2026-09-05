@@ -42,9 +42,9 @@ GitHub-hosted jobs.
       scientific invariants before committing.
 - [x] Update the narrow verification/deployment documentation and retain the
       strict exact drift policy.
-- [ ] Run authoritative backend, frontend, browser, repository, container,
+- [x] Run authoritative backend, frontend, browser, repository, container,
       notebook, and API checks; verify no source/model/UI/snapshot drift.
-- [ ] Push, open the requested PR, and prove the same commit with one initial
+- [x] Push, open the requested PR, and prove the same commit with one initial
       green CI run plus two independent green reruns. Leave it open and do not
       merge.
 
@@ -53,5 +53,7 @@ GitHub-hosted jobs.
 Record exact run IDs, attempts, CPU/runtime fingerprints, per-replica hash
 identity, measured numeric deltas, final variables, baseline generation run,
 verification commands, PR state, remote branch SHA, and remaining limitations in
-the final handoff. A cross-CPU claim is `YES` only when distinct CPU/runtime
+the final handoff. Final hosted proof is the initial PR CI run plus two
+independent reruns on the final branch head; the initial run and reruns are
+recorded in the PR and final handoff. A cross-CPU claim is `YES` only when distinct CPU/runtime
 fingerprints were actually observed; otherwise report `LIMITED`.
