@@ -22,7 +22,6 @@ jobs:
       OPENBLAS_NUM_THREADS: "1"
       OPENBLAS_CORETYPE: Haswell
       NPY_DISABLE_CPU_FEATURES: X86_V3,X86_V4
-      ATEN_CPU_CAPABILITY: default
       DNNL_MAX_CPU_ISA: AVX2
       MKL_NUM_THREADS: "1"
       NUMEXPR_NUM_THREADS: "1"
@@ -88,7 +87,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: probe-torch-dnnl-${{ matrix.replica }}-${{ github.run_id }}
+          name: probe-dnnl-${{ matrix.replica }}-${{ github.run_id }}
           path: ${{ runner.temp }}/probe-output/
           if-no-files-found: warn
           retention-days: 3
