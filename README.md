@@ -9,7 +9,7 @@ exploratory analysis through FastAPI and React.
 
 **Signal:** Leakage-safe CO₂ forecasting with chronological backtesting, interval evaluation, anomaly signals, and reproducible evidence.
 
-[Repository](https://github.com/Praciller/climate-co2-forecasting-ml)
+[Live Demo](https://climate-co2-forecasting-ml.vercel.app) · [Repository](https://github.com/Praciller/climate-co2-forecasting-ml)
 
 **What this demonstrates:** temporal split discipline · governed artifacts and intervals · bounded API/dashboard delivery.
 
@@ -248,7 +248,7 @@ Docker remains optional:
 docker compose up --build
 ```
 
-No hosted deployment is claimed.
+Verified portfolio demo: [climate-co2-forecasting-ml.vercel.app](https://climate-co2-forecasting-ml.vercel.app). It serves the same pinned historical governed bundle described above; it is not a current atmospheric feed or production SLA.
 
 ## Testing and CI
 
