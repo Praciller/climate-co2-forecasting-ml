@@ -232,6 +232,55 @@ be used to transfer generated reviewer evidence from the runner; remove that
 capture before the final PR. Do not commit manifests, validation predictions,
 model binaries, or other runtime-only outputs.
 
+## Issue #30 hosted-runner dispatch determinism
+
+Package constraints and thread limits alone did not fully define the hosted
+numeric runtime. The temporary Ubuntu 24.04 probe captured CPU models,
+`numpy.show_runtime()`, `threadpoolctl`, PyTorch dispatch information, and
+SHA-256 hashes for every policy-defined evidence file. Its replicas showed
+that heterogeneous CPU dispatch can change the pipeline-owned LSTM smoke
+metric while the statistical forecasts and anomaly outputs remain numerically
+unchanged. The original failing runner's CPU was not captured, so the exact
+historical CPU pair is not asserted here.
+
+The one-control-at-a-time probe evidence was:
+
+```text
+BASELINE_RUN=33965450224: 3/3 stable on AMD EPYC 9V74 and AMD EPYC 7763
+OPENBLAS_ONLY_RUN=33965685116: 3/3 passed, but LSTM hashes varied by 3.9633218307244533e-07
+NUMPY_ONLY_RUN=33966547573: 3/3 passed, but one Intel replica diverged in governed reports
+OPENBLAS_NUMPY_RUN=33965920150: 3/3 stable in the probe, but an independent PR runner still drifted
+PYTORCH_DEFAULT_RUN=33966180658: 3/3 passed, but LSTM hashes varied again
+DNNL_WITH_ATEN_RUN=33967207450: 3/3 byte-identical substantive evidence across AMD and Intel
+DNNL_MINIMIZED_RUN=33967405894 (attempts 1-3): 3/3 byte-identical per attempt across AMD EPYC 9V74 and EPYC 7763
+```
+
+The permanent hosted contract therefore pins the smallest control set proven
+stable across the observed CPU mix:
+
+```text
+OPENBLAS_CORETYPE=Haswell
+NPY_DISABLE_CPU_FEATURES=X86_V3,X86_V4
+DNNL_MAX_CPU_ISA=AVX2
+ATEN_CPU_CAPABILITY=<unset>
+```
+
+The existing hash comparison remains strict: every policy-defined file is
+compared byte-for-byte, including PNG figures; only
+`reports/live_forecast.json.generated_at` is normalized. The probe's numerical
+contract remained unchanged: SARIMA was selected by development rolling-origin
+MAE, Exponential Smoothing retained the lower final-test MAE, interval
+coverage remained 0.9102564102564102, Isolation Forest produced 8 signals,
+and residual anomalies remained 0. These results do not promote the LSTM,
+change final-test semantics, or turn exploratory anomalies into verified
+climate events.
+
+The controls are applied identically to the `backend`, `browser-e2e`, and
+manual `serving-bundle` workflows. Windows remains a semantic-development
+environment; governed evidence refreshes originate from the pinned Linux
+workflow. The diagnostic workflow used for this investigation is temporary
+and is removed before the repair PR.
+
 The two-run determinism proof for this migration compares SHA-256 hashes for
 every tracked evidence file, including PNG figures, across two runs of the same
 commit. The only normalized field is
